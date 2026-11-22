@@ -1,0 +1,41 @@
+title: Blog Post
+sections:
+  main:
+    display: Article
+    fields:
+      -
+        handle: excerpt
+        field:
+          type: textarea
+          display: Excerpt
+          rows: 3
+      -
+        handle: content
+        field:
+          type: bard
+          display: Article Content
+          buttons:
+            - h2
+            - h3
+            - bold
+            - italic
+            - unorderedlist
+            - orderedlist
+            - quote
+            - link
+  seo:
+    display: SEO
+    fields:
+      -
+        handle: seo_title
+        field:
+          type: text
+          display: Meta Title
+          character_limit: 60
+      -
+        handle: seo_description
+        field:
+          type: textarea
+          display: Meta Description
+          character_limit: 160
+          rows: 3
