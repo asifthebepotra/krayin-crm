@@ -4,6 +4,7 @@ namespace Webkul\StatamicIntegration\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Schema;
 use RuntimeException;
 use Webkul\StatamicIntegration\Models\CmsThemeInstallation;
 use Webkul\StatamicIntegration\Services\CmsThemeManager;
