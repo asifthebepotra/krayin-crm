@@ -15,6 +15,13 @@ sections:
           display: Hero Description
           rows: 3
       -
+        handle: hero_image
+        field:
+          type: assets
+          display: Hero Image
+          container: assets
+          max_files: 1
+      -
         handle: content
         field:
           type: bard
