@@ -10,6 +10,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Public Website Routes
+    |--------------------------------------------------------------------------
+    |
+    | Statamic's standard catch-all is disabled so this integration can
+    | register the explicit root page after Krayin's existing "/" route.
+    | Statamic action routes and its Control Panel remain enabled.
+    |
+    */
+    'public_routes_enabled' => true,
+
+    /*
+    |--------------------------------------------------------------------------
     | Minimum supported Statamic version
     |--------------------------------------------------------------------------
     */
