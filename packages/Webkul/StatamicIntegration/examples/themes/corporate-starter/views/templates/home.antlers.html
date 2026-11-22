@@ -1,0 +1,18 @@
+<section class="corporate-hero">
+    <p class="corporate-eyebrow">Welcome</p>
+    <h1>{{ hero_heading ?? title }}</h1>
+
+    {{ if hero_text }}
+        <p class="corporate-intro">{{ hero_text }}</p>
+    {{ /if }}
+
+    {{ if hero_image }}
+        {{ hero_image }}
+            <img class="corporate-hero-image" src="{{ url }}" alt="{{ alt ?? title }}">
+        {{ /hero_image }}
+    {{ /if }}
+</section>
+
+<section class="corporate-content">
+    {{ content }}
+</section>
