@@ -20,6 +20,10 @@ Route::middleware(['web', 'admin_locale', 'user'])
         Route::post('cms/themes', [CmsThemeController::class, 'store'])
             ->name('cms.themes.store');
 
+        Route::get('cms/themes/{theme}/preview', [CmsThemeController::class, 'preview'])
+            ->whereNumber('theme')
+            ->name('cms.themes.preview');
+
         Route::post('cms/themes/{theme}/activate', [CmsThemeController::class, 'activate'])
             ->whereNumber('theme')
             ->name('cms.themes.activate');
