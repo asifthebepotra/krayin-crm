@@ -32,7 +32,8 @@ class CmsThemeTags extends Tags
             throw new RuntimeException('Invalid CMS theme asset path.');
         }
 
-        $theme = app(CmsThemeManager::class)->activeTheme();
+        $theme = request()->attributes->get('cms_theme_preview')
+            ?: app(CmsThemeManager::class)->activeTheme();
 
         if (! $theme) {
             return '';
