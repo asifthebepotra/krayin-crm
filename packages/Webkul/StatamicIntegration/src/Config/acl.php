@@ -9,6 +9,7 @@ return [
             'admin.cms.open',
             'admin.cms.themes.index',
             'admin.cms.themes.store',
+            'admin.cms.themes.preview',
             'admin.cms.themes.activate',
             'admin.cms.themes.destroy',
         ],
