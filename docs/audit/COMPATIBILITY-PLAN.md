@@ -372,3 +372,60 @@ Composer validation warnings:
 The attempted `php artisan config:clear` failed because `vendor/autoload.php` does not exist yet. This is expected for a fresh checkout with no dependencies installed; Artisan commands must wait until Composer creates `vendor/`.
 
 **Next gate:** add Statamic's documented Composer hooks while preserving Krayin's existing scripts, validate JSON/Composer configuration, then perform the actual dependency update on this audit branch. Do not run migrations or implement custom integration code yet.
+
+
+## 16. Bootstrap and first-install sequence after the local dry run
+
+The user-provided local dry run completed successfully and selected Statamic v6.42.0, Inertia Laravel v2.0.28, Laravel v12.73.0, with 35 installs, 12 updates and zero removals.
+
+The local repository did not have `vendor/autoload.php`, so Artisan was not available before dependencies were installed. Do **not** run `composer install` as a bootstrap step while the current `composer.json` requires packages that are absent from `composer.lock`: Composer 2.5+ treats required-but-unlocked packages as an install error (see Composer's official [lockfile mismatch guidance](https://getcomposer.org/doc/articles/resolving-merge-conflicts.md)).
+
+### First actual installation
+
+1. Confirm the clean audit branch is checked out.
+2. Confirm `composer.json` contains the exact Statamic and Inertia requirements.
+3. Confirm no unwanted local edits exist.
+4. Since the dry run was reviewed and passed, run the first actual update with scripts suppressed:
+
+```bash
+composer update statamic/cms inertiajs/inertia-laravel --with-all-dependencies --no-scripts
+```
+
+This will resolve/write the combined lockfile and install dependencies without firing Laravel/Statamic Composer hooks prematurely.
+
+5. Then run package discovery manually:
+
+```bash
+php artisan package:discover --ansi
+```
+
+6. Run the Statamic installation command manually:
+
+```bash
+php artisan statamic:install --ansi
+```
+
+7. Verify:
+
+```bash
+composer validate
+composer check-platform-reqs
+composer show laravel/framework
+composer show statamic/cms
+composer show inertiajs/inertia-laravel
+php artisan about
+php artisan route:list
+```
+
+If `package:discover` or `statamic:install` fails, stop and provide the complete output. Do not run migrations or modify database schema until the install output is reviewed.
+
+### Configure Statamic Composer hooks for subsequent operations
+
+After the initial package installation and successful manual Statamic install, add the hooks required by Statamic's official existing-Laravel guide:
+
+- Add `pre-update-cmd` containing `Statamic\\Console\\Composer\\Scripts::preUpdateCmd`.
+- Append `@php artisan statamic:install --ansi` to the existing `post-autoload-dump` array, retaining Krayin's Laravel ComposerScripts and `@php artisan package:discover --ansi`.
+
+Do not replace Krayin's existing Composer scripts. Once the hooks are added, run `composer validate` and inspect the diff. These hooks are for subsequent Composer lifecycle operations; the first install deliberately used `--no-scripts` and invoked the required commands manually.
+
+**Important:** This first-install sequence deliberately separates package installation from post-install Artisan commands because this checkout initially has no `vendor/` directory. It avoids trying to invoke the Statamic install command before the package exists and is discoverable.
