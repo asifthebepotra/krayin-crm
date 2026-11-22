@@ -1,0 +1,9 @@
+{
+  "name": "Corporate Starter",
+  "slug": "corporate-starter",
+  "version": "1.0.0",
+  "author": "Krayin CMS",
+  "description": "Starter responsive business theme for Statamic.",
+  "minimum_statamic_version": "6.42.0",
+  "template_language": "antlers"
+}
