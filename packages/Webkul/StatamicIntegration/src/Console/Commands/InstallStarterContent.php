@@ -3,14 +3,16 @@
 namespace Webkul\StatamicIntegration\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Schema;
 use Statamic\Statamic;
 
 class InstallStarterContent extends Command
 {
     protected $signature = 'statamic-integration:install-starter-content';
 
-    protected $description = 'Install the starter Pages and Blog structure for the Statamic website';
+    protected $description = 'Install starter Pages and Blog content and grant CMS access to Krayin administrators';
 
     public function handle(): int
     {
@@ -58,8 +60,63 @@ class InstallStarterContent extends Command
             $this->components->warn("Skipped {$skipped} existing files. Your current content was preserved.");
         }
 
+        $this->assignCmsAdministratorRole();
+
         $this->components->info('Open the Statamic Control Panel and review the Pages and Blog collections.');
 
         return self::SUCCESS;
+    }
+
+    /**
+     * Assign the starter CMS administrator role to active Krayin users
+     * whose Krayin role is already configured as a full administrator.
+     *
+     * This changes only the Statamic pivot. Krayin role_id and CRM
+     * permissions are never modified.
+     */
+    protected function assignCmsAdministratorRole(): void
+    {
+        $roleFile = resource_path('users/roles.yaml');
+
+        if (
+            ! File::exists($roleFile)
+            || ! str_contains(File::get($roleFile), 'cms-administrator:')
+        ) {
+            $this->components->warn(
+                'The cms-administrator Statamic role was not found. Existing role files were preserved; assign a CMS role manually.'
+            );
+
+            return;
+        }
+
+        $pivotTable = config('statamic.users.tables.role_user', 'statamic_role_user');
+
+        if (! Schema::hasTable($pivotTable)) {
+            $this->components->warn(
+                'Statamic user tables are not ready. Run database migrations, then rerun this command to grant CMS access.'
+            );
+
+            return;
+        }
+
+        $adminIds = DB::table('users')
+            ->join('roles', 'users.role_id', '=', 'roles.id')
+            ->where('users.status', 1)
+            ->where('roles.permission_type', 'all')
+            ->pluck('users.id');
+
+        foreach ($adminIds as $userId) {
+            DB::table($pivotTable)->updateOrInsert(
+                [
+                    'user_id' => $userId,
+                    'role_id' => 'cms-administrator',
+                ],
+                []
+            );
+        }
+
+        $this->components->info(
+            "Granted the CMS Administrator role to {$adminIds->count()} active Krayin administrator account(s)."
+        );
     }
 }
