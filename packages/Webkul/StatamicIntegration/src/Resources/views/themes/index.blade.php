@@ -29,6 +29,12 @@
             </div>
         @endif
 
+        @unless ($tablesReady)
+            <div class="rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-100">
+                Run <code>php artisan migrate</code> before installing or activating themes.
+            </div>
+        @endunless
+
         <section class="rounded-lg border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900">
             <h2 class="font-semibold text-gray-900 dark:text-white">Upload Theme ZIP</h2>
             <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">
@@ -111,6 +117,15 @@
                         </div>
 
                         <div class="flex flex-wrap items-center gap-2">
+                            <a
+                                href="{{ route('admin.cms.themes.preview', $theme->id) }}"
+                                target="_blank"
+                                rel="noopener"
+                                class="secondary-button"
+                            >
+                                Preview
+                            </a>
+
                             @if ($activeTheme && $activeTheme->id === $theme->id)
                                 <span class="rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-800 dark:bg-green-900 dark:text-green-200">
                                     Active
