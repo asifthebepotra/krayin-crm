@@ -5,6 +5,7 @@ namespace Webkul\StatamicIntegration\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\URL;
 use RuntimeException;
 use Webkul\StatamicIntegration\Models\CmsThemeInstallation;
 use Webkul\StatamicIntegration\Services\CmsThemeManager;
@@ -40,6 +41,19 @@ class CmsThemeController extends Controller
         return redirect()
             ->route('admin.cms.themes.index')
             ->with('success', "Theme [{$theme->name}] {$theme->version} was installed.");
+    }
+
+    public function preview(int $theme)
+    {
+        $theme = CmsThemeInstallation::findOrFail($theme);
+
+        $url = URL::temporarySignedRoute(
+            'statamic.site.root',
+            now()->addMinutes(10),
+            ['cms_theme_preview' => $theme->id]
+        );
+
+        return redirect()->away($url);
     }
 
     public function activate(int $theme, CmsThemeManager $manager)
