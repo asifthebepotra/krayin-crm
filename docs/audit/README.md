@@ -45,3 +45,9 @@
 Do not begin `Webkul/StatamicIntegration` until the mandatory runtime checks pass and `COMPATIBILITY-DECISION.md` records GO with evidence.
 
 GitHub source inspection does not execute PHP, Composer, MySQL or Laravel. Runtime tests must be run in the local PHP development environment using the immutable source pins.
+
+
+
+### Additional route finding
+
+Krayin explicitly owns `GET /` and redirects it to CRM login, while Statamic's public site is registered through an optional catch-all route. The compatibility gate now explicitly requires that `/` serve the Statamic homepage and CRM login remain under the configured admin path.
