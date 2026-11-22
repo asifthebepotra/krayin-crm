@@ -14,6 +14,9 @@ Route::middleware(['web', 'admin_locale', 'user'])
         Route::get('cms/open', [CmsController::class, 'open'])
             ->name('cms.open');
 
+        Route::get('cms/submissions', [CmsSubmissionController::class, 'index'])
+            ->name('cms.submissions.index');
+
         Route::get('cms/settings', [CmsWebsiteSettingsController::class, 'index'])
             ->name('cms.settings.index');
 
