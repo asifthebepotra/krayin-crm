@@ -130,6 +130,11 @@
                                 <span class="rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-800 dark:bg-green-900 dark:text-green-200">
                                     Active
                                 </span>
+
+                                <form method="POST" action="{{ route('admin.cms.themes.deactivate') }}">
+                                    @csrf
+                                    <button type="submit" class="secondary-button">Use built-in theme</button>
+                                </form>
                             @else
                                 <form method="POST" action="{{ route('admin.cms.themes.activate', $theme->id) }}">
                                     @csrf
