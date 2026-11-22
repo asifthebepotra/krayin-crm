@@ -3,11 +3,11 @@
 namespace Webkul\StatamicIntegration\Services;
 
 use Composer\InstalledVersions;
+use enshrined\svgSanitize\Sanitizer;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 use RuntimeException;
-use Statamic\Statamic;
 use Webkul\StatamicIntegration\Models\CmsThemeInstallation;
 use ZipArchive;
 
@@ -140,7 +140,19 @@ class ThemeInstaller
             throw new RuntimeException('The theme archive must contain between 2 and 1000 entries.');
         }
 
-        $manifestRaw = $zip->getFromName('theme.json');
+        $manifestIndex = $zip->locateName('theme.json', ZipArchive::FL_NOCASE);
+
+        if ($manifestIndex === false) {
+            throw new RuntimeException('The theme archive must contain a root theme.json manifest.');
+        }
+
+        $manifestStat = $zip->statIndex($manifestIndex);
+
+        if (($manifestStat['size'] ?? 0) > 32768) {
+            throw new RuntimeException('The theme.json manifest cannot exceed 32 KB.');
+        }
+
+        $manifestRaw = $zip->getFromIndex($manifestIndex);
 
         if ($manifestRaw === false) {
             throw new RuntimeException('The theme archive must contain a root theme.json manifest.');
