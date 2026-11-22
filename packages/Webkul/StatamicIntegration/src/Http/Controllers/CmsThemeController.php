@@ -56,6 +56,19 @@ class CmsThemeController extends Controller
         return redirect()->away($url);
     }
 
+    public function deactivate(CmsThemeManager $manager)
+    {
+        try {
+            $manager->deactivate();
+        } catch (RuntimeException $exception) {
+            return back()->withErrors(['theme' => $exception->getMessage()]);
+        }
+
+        return redirect()
+            ->route('admin.cms.themes.index')
+            ->with('success', 'The built-in Statamic templates are now active.');
+    }
+
     public function activate(int $theme, CmsThemeManager $manager)
     {
         $theme = CmsThemeInstallation::findOrFail($theme);
