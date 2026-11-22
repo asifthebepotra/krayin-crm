@@ -178,3 +178,137 @@ Statamic's inspected package manifest declares a proprietary license. Confirm th
 ## 9. Execution limitation
 
 GitHub source inspection is complete for the listed files. The GitHub integration can read and update repository content, but it does not execute PHP, Composer, MySQL or the Laravel application. The next step must run in a PHP development environment with this repository cloned. Do not create Webkul/StatamicIntegration until the runtime checklist is completed and COMPATIBILITY-DECISION.md records GO.
+
+## 10. Updated exact installation sequence for this Krayin source
+
+This section supersedes any shorter generic Composer example above. It reflects the actual Krayin Composer scripts and the current Statamic 6 installation guide.
+
+### 10.1 Work only on the audit branch
+
+- Confirm the current branch is `audit/SA-01-krayin-statamic-compatibility`.
+- Confirm `composer.json` and `composer.lock` are clean before editing.
+- Preserve an untouched baseline copy of both files or a Git commit.
+- Do not run dependency installation on `main` or the local `master` branch.
+
+### 10.2 Add exact dependency requirements without resolving them yet
+
+Use exact Statamic and a supported Inertia 2 constraint:
+
+```bash
+composer require statamic/cms:6.42.0 inertiajs/inertia-laravel:^2.0.7 --no-update
+```
+
+Why pin Inertia 2: Statamic's current v6 installation documentation explicitly says Inertia 3 is not currently supported, even though the v6.42.0 package manifest declares a broad `^2.0.7 || ^3.0` constraint. The inspected Krayin lockfile does not currently contain Inertia Laravel. The root constraint prevents Composer selecting Inertia 3 for this compatibility run.
+
+### 10.3 Merge Statamic's Composer scripts; do not overwrite Krayin's
+
+Statamic's official existing-Laravel installation guide requires:
+
+- `pre-update-cmd`: `Statamic\\Console\\Composer\\Scripts::preUpdateCmd`
+- `post-autoload-dump`: keep Laravel ComposerScripts and `@php artisan package:discover --ansi`, then add `@php artisan statamic:install --ansi`.
+
+Krayin already has a `post-autoload-dump` array with Laravel ComposerScripts and `package:discover`. Add the Statamic command to that existing array; do not replace or duplicate the existing commands. Preserve `post-root-package-install` and `post-create-project-cmd` too.
+
+Before resolving dependencies:
+
+```bash
+php artisan config:clear
+composer validate
+```
+
+### 10.4 Inspect Composer's proposed changes
+
+```bash
+composer update statamic/cms inertiajs/inertia-laravel -W --dry-run
+```
+
+Capture and review:
+- Laravel Framework remains on a compatible Laravel 12 release.
+- Inertia Laravel resolves to 2.x, not 3.x.
+- No Krayin dependencies are removed.
+- No unrelated major-version upgrades are proposed.
+- Symfony, Guzzle, Flysystem, image-processing and authentication dependencies resolve.
+- No PHP platform requirement is violated.
+
+A dry run is only a solver proposal. It does not prove application boot or Control Panel compatibility.
+
+### 10.5 Actual install (only after the dry run is reviewed)
+
+```bash
+composer update statamic/cms inertiajs/inertia-laravel -W
+```
+
+Then:
+
+```bash
+composer validate
+composer check-platform-reqs
+composer show laravel/framework
+composer show statamic/cms
+composer show inertiajs/inertia-laravel
+composer audit
+php artisan package:discover
+php artisan about
+php artisan route:list
+```
+
+Review the generated `config/statamic` and new directories. The existing Laravel installation will not automatically include the standard Statamic pages collection, entries, or views; those are deliberately configured in later audit tests.
+
+## 11. Statamic identity and permission prototype
+
+The pinned Statamic source has an Eloquent user repository that derives the model from `statamic.users.guards.cp` -> Laravel guard provider -> provider model. It also wraps generic Eloquent models through `UserRepository::fromUser()`. Therefore prototype this supported shared-guard approach before building a separate login bridge.
+
+Proposed prototype configuration (subject to runtime verification):
+
+- Statamic user repository: `eloquent`.
+- Statamic CP guard: Krayin's `user` guard.
+- Statamic frontend guard: set deliberately and test; do not leave a guard name that does not exist.
+- Krayin `user` guard provider remains `Webkul\\User\\Models\\User`.
+- Keep Statamic CP middleware groups native.
+- Add a dedicated integration check on authenticated CP requests that rejects inactive Krayin users and invalidates the session.
+
+Do not attach Krayin's route-name Bouncer to all Statamic CP routes. Statamic evaluates its own permission `access cp` through its permission Gate.
+
+### 11.1 CMS role storage
+
+- Keep Statamic role and group definitions file-backed initially.
+- Configure distinct CMS relationship pivot tables, e.g. `statamic_role_user` and `statamic_group_user`.
+- Do not point Statamic at Krayin's `roles`, `groups` or `user_groups` tables.
+- Review the output of `php please auth:migration` before running migrations. Ensure generated table names use the configured CMS pivots.
+
+### 11.2 User table columns
+
+Statamic's Eloquent user adapter reads/writes `preferences` and updates `last_login`. The inspected Krayin schema lacks those columns. Add them with an integration-owned migration and casts on the Krayin User model, after reviewing the migration generator output.
+
+Statamic 2FA fields are not present in Krayin's user schema. Disable Statamic 2FA for the first prototype/release; if it is later enabled, add and test the required fields through an integration migration.
+
+### 11.3 Account-management restrictions
+
+Krayin must remain the account source of truth. Statamic's native user creation writes through its configured user repository, so it must not create Krayin accounts with a missing required Krayin `role_id`.
+
+For the first release:
+- Do not allow Statamic to create/delete employee accounts.
+- Do not allow Statamic to change Krayin passwords or CRM roles.
+- Make CRM identity attributes such as name/email/status read-only or keep them out of editable CMS blueprints.
+- If CMS role assignment is enabled in Statamic, verify it changes only the CMS role pivot and not Krayin's `role_id`.
+
+### 11.4 Mandatory identity tests
+
+- Krayin login allows access to Statamic CP in the same browser session.
+- Statamic login uses the same underlying Krayin user ID.
+- Statamic logout invalidates the shared session; verify Krayin is also logged out.
+- Krayin logout invalidates the shared session; verify Statamic is also logged out.
+- Disabled Krayin account is denied on the next Statamic CP request.
+- CMS-only permissions do not grant CRM ACL permissions.
+- CRM-only users without `access cp` are denied from the CP.
+- Statamic user management cannot create or mutate Krayin accounts outside Krayin's lifecycle.
+
+## 12. Existing-app content and route checks
+
+The official Statamic existing-Laravel guide notes that the app needs a Pages collection, entries, views and a layout configured manually. Create a minimal Pages collection using the documented tree route `{parent_uri}/{slug}`, then a `default` template and `layout` view for the first smoke test.
+
+Statamic relies on a catch-all frontend route. Verify Krayin has no earlier catch-all route that captures public URLs. Existing explicitly declared routes take precedence; test both existing Krayin routes and Statamic's public content routes.
+
+## 13. Licensing gate
+
+The Statamic core package declares a proprietary license. Confirm the required Statamic edition and commercial terms before production, especially because a multi-user CMS with role-based access is part of the intended product.
