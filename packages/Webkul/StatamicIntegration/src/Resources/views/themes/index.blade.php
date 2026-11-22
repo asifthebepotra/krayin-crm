@@ -59,6 +59,7 @@
                         type="file"
                         accept=".zip,application/zip"
                         required
+                        @disabled(! $tablesReady)
                         class="w-full rounded-md border border-gray-300 p-2 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white"
                     >
                     @error('theme_archive')
@@ -66,7 +67,7 @@
                     @enderror
                 </div>
 
-                <button type="submit" class="primary-button">Install theme</button>
+                <button type="submit" class="primary-button" @disabled(! $tablesReady)>Install theme</button>
             </form>
         </section>
 
