@@ -100,3 +100,12 @@ This finding does not change the status: **PENDING — no runtime GO decision ye
 ## Additional route/API scope decision
 
 The Statamic Content API is disabled by default and is not required for the native-Control-Panel plus server-rendered-website MVP. Keep it disabled during SA-01. If enabled in a later phase, verify its default `api` prefix does not collide with Krayin's existing API route group and review every exposed resource.
+
+
+## Local Composer dry-run update (2026-11-22)
+
+**Dependency solver: PASS (dry-run only).** User-provided terminal output shows 35 installs, 12 updates and zero removals. Composer selected Statamic v6.42.0, Inertia Laravel v2.0.28 and Laravel v12.73.0 (up from v12.71.0). Guzzle is proposed to move from 7.16.1 to 7.16.5; Symfony HttpFoundation remains v7.4.23.
+
+The local `php artisan config:clear` attempt failed because `vendor/autoload.php` was absent in the fresh checkout. No runtime compatibility result is implied.
+
+The Composer validate warnings about the exact Statamic version and stale lockfile are expected for this pinned audit plus `--no-update` stage. Actual installation, Laravel boot, route tests, auth/ACL tests, rendering and regression tests remain pending. The overall decision remains **PENDING**, not GO.
