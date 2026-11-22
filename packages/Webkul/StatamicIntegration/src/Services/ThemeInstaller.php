@@ -184,7 +184,7 @@ class ThemeInstaller
                 throw new RuntimeException('The theme archive contains an invalid path.');
             }
 
-            if (str_contains($name, '\\\\')) {
+            if (str_contains($name, chr(92))) {
                 throw new RuntimeException('Theme archive paths must use forward slashes.');
             }
 
