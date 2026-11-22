@@ -195,8 +195,12 @@ This section supersedes any shorter generic Composer example above. It reflects 
 Use exact Statamic and a supported Inertia 2 constraint:
 
 ```bash
-composer require statamic/cms:6.42.0 inertiajs/inertia-laravel:^2.0.7 --no-update
+composer require "statamic/cms:6.42.0" "inertiajs/inertia-laravel:^2.0.7" --no-update
 ```
+
+This updates `composer.json` only; it does not install packages or update `composer.lock`.
+
+For the dependency-only dry run, do not add the Statamic Composer event scripts yet. First test the solver with scripts disabled. After the dry run is reviewed and approved, merge Statamic's Composer scripts as described below, then perform the actual install.
 
 Why pin Inertia 2: Statamic's current v6 installation documentation explicitly says Inertia 3 is not currently supported, even though the v6.42.0 package manifest declares a broad `^2.0.7 || ^3.0` constraint. The inspected Krayin lockfile does not currently contain Inertia Laravel. The root constraint prevents Composer selecting Inertia 3 for this compatibility run.
 
@@ -213,14 +217,18 @@ Before resolving dependencies:
 
 ```bash
 php artisan config:clear
-composer validate
+composer validate --no-check-lock
 ```
+
+The lock file is expected to be temporarily out of sync because the new constraints have deliberately not been resolved yet.
 
 ### 10.4 Inspect Composer's proposed changes
 
 ```bash
-composer update statamic/cms inertiajs/inertia-laravel -W --dry-run
+composer update statamic/cms inertiajs/inertia-laravel -W --dry-run --no-scripts
 ```
+
+The `--no-scripts` flag keeps this phase focused on dependency resolution and prevents Laravel/Statamic Composer hooks from running. Composer documents `--dry-run` as a simulation and `--no-scripts` as disabling root Composer scripts.
 
 Capture and review:
 - Laravel Framework remains on a compatible Laravel 12 release.
