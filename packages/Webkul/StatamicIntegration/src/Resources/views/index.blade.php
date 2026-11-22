@@ -95,6 +95,23 @@
             </div>
         @endunless
 
+        @if ($statamicInstalled)
+            <div class="rounded-lg border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900">
+                <h2 class="font-semibold text-gray-900 dark:text-white">
+                    Install the starter website structure
+                </h2>
+
+                <p class="mt-2 text-sm text-gray-600 dark:text-gray-300">
+                    This installs the default Pages and Blog collections, blueprints and Antlers templates.
+                    Existing files are skipped and will not be overwritten.
+                </p>
+
+                <p class="mt-3 rounded bg-gray-50 px-3 py-2 font-mono text-xs text-gray-800 dark:bg-gray-800 dark:text-gray-100">
+                    php artisan statamic-integration:install-starter-content
+                </p>
+            </div>
+        @endif
+
         @if ($controlPanelEnabled)
             <section class="rounded-lg border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900">
                 <h2 class="font-semibold text-gray-900 dark:text-white">
