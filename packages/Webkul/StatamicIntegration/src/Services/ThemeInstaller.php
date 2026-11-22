@@ -32,6 +32,10 @@ class ThemeInstaller
 
     public function install(UploadedFile $archive): CmsThemeInstallation
     {
+        if (! Schema::hasTable('cms_theme_installations')) {
+            throw new RuntimeException('Run the CMS database migrations before installing themes.');
+        }
+
         if (! class_exists(ZipArchive::class)) {
             throw new RuntimeException('The PHP zip extension is required to install themes.');
         }
