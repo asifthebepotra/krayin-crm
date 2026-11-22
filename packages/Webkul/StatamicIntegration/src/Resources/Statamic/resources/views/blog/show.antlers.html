@@ -11,6 +11,13 @@
                 {{ excerpt }}
             </p>
         {{ /if }}
+        {{ if featured_image }}
+            <div style="margin-top: 28px; overflow: hidden; border-radius: 12px;">
+                {{ featured_image }}
+                    <img src="{{ url }}" alt="{{ alt ?? title }}" style="display: block; width: 100%; height: auto;">
+                {{ /featured_image }}
+            </div>
+        {{ /if }}
     </header>
 
     <div class="content" style="color: #35434c;">
