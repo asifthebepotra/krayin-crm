@@ -2,15 +2,20 @@
 
 namespace Webkul\StatamicIntegration\Providers;
 
+use Illuminate\Routing\Router;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Statamic\Http\Controllers\FrontendController;
+use Statamic\Statamic;
 use Webkul\StatamicIntegration\Console\Commands\InstallStarterContent;
+use Webkul\StatamicIntegration\Http\Middleware\EnsureKrayinCmsUserIsActive;
+use Webkul\StatamicIntegration\Models\CmsUser;
 
 class StatamicIntegrationServiceProvider extends ServiceProvider
 {
     /**
-     * Register package configuration.
+     * Register package configuration and the shared Krayin user model.
      */
     public function register(): void
     {
@@ -19,6 +24,18 @@ class StatamicIntegrationServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(__DIR__.'/../Config/menu.php', 'menu.admin');
 
         $this->mergeConfigFrom(__DIR__.'/../Config/acl.php', 'acl');
+
+        /*
+         * Statamic's Eloquent repository resolves its model from the provider
+         * selected by the CP guard. Use a compatible subclass of Krayin's
+         * existing User model so CRM authentication and relationships remain
+         * the same while Statamic gets its JSON/datetime casts.
+         */
+        if (class_exists(Statamic::class)) {
+            config()->set('auth.providers.users.model', CmsUser::class);
+
+            Auth::forgetGuards();
+        }
     }
 
     /**
@@ -32,6 +49,8 @@ class StatamicIntegrationServiceProvider extends ServiceProvider
 
         $this->loadViewsFrom(__DIR__.'/../Resources/views', 'statamic_integration');
 
+        $this->loadMigrationsFrom(__DIR__.'/../Database/Migrations');
+
         $this->registerPublicHomepageRoute();
 
         if ($this->app->runningInConsole()) {
@@ -40,13 +59,48 @@ class StatamicIntegrationServiceProvider extends ServiceProvider
             ]);
         }
 
+        $this->app->booted(function () {
+            $this->configureStatamicIdentity();
+        });
+
         $this->app->register(ModuleServiceProvider::class);
+    }
+
+    /**
+     * Configure Statamic to use Krayin's existing session guard and its
+     * separate CMS role/group relationship tables.
+     */
+    protected function configureStatamicIdentity(): void
+    {
+        if (! class_exists(Statamic::class)) {
+            return;
+        }
+
+        config()->set('statamic.users.repository', 'eloquent');
+        config()->set('statamic.users.guards.cp', 'user');
+        config()->set('statamic.users.guards.web', 'user');
+
+        config()->set('statamic.users.tables.role_user', 'statamic_role_user');
+        config()->set('statamic.users.tables.group_user', 'statamic_group_user');
+        config()->set('statamic.users.tables.roles', false);
+        config()->set('statamic.users.tables.groups', false);
+
+        /*
+         * Krayin's user table has no Statamic two-factor columns. Keep this
+         * disabled until an explicit, reviewed migration adds that feature.
+         */
+        config()->set('statamic.users.two_factor_enabled', false);
+        config()->set('statamic.users.wizard_invitation', false);
+
+        $this->app->make(Router::class)->prependMiddlewareToGroup(
+            'statamic.cp.authenticated',
+            EnsureKrayinCmsUserIsActive::class
+        );
     }
 
     /**
      * Krayin's front package registers "/" as a redirect to the CRM login.
      * Once Statamic is installed, the public website must own the domain root.
-     * Its controller supplies Statamic's normal content lookup and middleware.
      */
     protected function registerPublicHomepageRoute(): void
     {
