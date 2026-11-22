@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use Webkul\StatamicIntegration\Http\Controllers\CmsController;
 use Webkul\StatamicIntegration\Http\Controllers\CmsThemeController;
+use Webkul\StatamicIntegration\Http\Controllers\CmsSubmissionController;
+use Webkul\StatamicIntegration\Http\Controllers\CmsWebsiteSettingsController;
 
 Route::middleware(['web', 'admin_locale', 'user'])
     ->prefix(config('app.admin_path'))
@@ -31,10 +33,6 @@ Route::middleware(['web', 'admin_locale', 'user'])
 
         Route::post('cms/themes/deactivate', [CmsThemeController::class, 'deactivate'])
             ->name('cms.themes.deactivate');
-
-        Route::get('cms/themes/{theme}/preview', [CmsThemeController::class, 'preview'])
-            ->whereNumber('theme')
-            ->name('cms.themes.preview');
 
         Route::get('cms/themes/{theme}/preview', [CmsThemeController::class, 'preview'])
             ->whereNumber('theme')
