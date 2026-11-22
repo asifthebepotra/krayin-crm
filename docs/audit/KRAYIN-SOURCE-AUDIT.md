@@ -2237,3 +2237,37 @@ return [
 
 ```
 
+
+
+## Additional source finding: exact Krayin users schema
+
+The pinned Krayin User migrations define the existing `users` table with:
+
+- `id` auto-increment integer.
+- `name`, `email` (unique), nullable `password`.
+- `status` (boolean, default 0).
+- `role_id` (unsigned integer, required, foreign key to Krayin `roles.id`, cascade delete).
+- `remember_token`.
+- `created_at` and `updated_at`.
+
+The table does **not** declare these Statamic Eloquent-user fields in the inspected migrations:
+
+- `preferences`
+- `last_login`
+- `two_factor_secret`
+- `two_factor_confirmed_at`
+- `two_factor_recovery_codes`
+
+The Krayin user schema also has `roles` and `groups` tables, plus `user_groups` pivot. Its own role assignment is a `role_id` foreign key on `users`, not Statamic's `role_user` pivot.
+
+### Implications for shared Statamic identity
+
+Statamic v6.42.0's Eloquent user adapter accesses `model()->preferences` and `model()->last_login`; its native two-factor methods access the two-factor fields above. Before enabling these functions with Krayin's User model, either add compatible, nullable fields via an integration migration or disable the relevant Statamic features until their storage is deliberately implemented and tested.
+
+Statamic's Eloquent role/group adapter reads separate pivot tables named by `statamic.users.tables.role_user` and `group_user`. Keep those separate from Krayin's `user_groups`; use explicitly prefixed CMS tables (for example `statamic_role_user` and `statamic_group_user`). Keep Statamic `roles` and `groups` file-backed initially (`tables.roles=false`, `tables.groups=false`) to avoid collision with Krayin's existing `roles` and `groups` tables.
+
+Statamic user creation is not a safe alternative to Krayin user management: its native UsersController creates users directly through the Statamic user repository. Krayin's `users.role_id` is required and is part of the CRM role model. Therefore Krayin must remain authoritative for employee account creation, status and CRM role assignment. Statamic user-management permissions should be restricted; at most, expose CMS role assignment for existing users after validation.
+
+### Disabled-user enforcement
+
+Krayin's Bouncer middleware checks `users.status`, but Statamic CP uses its own `statamic.cp.authenticated` middleware and `Authorize` check. The Statamic authorization path does not automatically invoke Krayin's Bouncer. A small integration middleware must verify the authenticated Krayin user's `status` before any authenticated Statamic CP request and invalidate/reject disabled accounts. This is a mandatory security acceptance test.
