@@ -135,8 +135,9 @@ class ThemeInstaller
 
     /**
      * Validate every archive entry before extraction. Theme packages contain
-     * Antlers templates and static assets only; executable PHP and scripts
-     * are never accepted.
+     * Antlers templates and static assets only. Server-side PHP and installer
+     * scripts are never accepted. JavaScript is allowed only in the public
+     * theme assets directory and is trusted theme code uploaded by a CMS admin.
      */
     protected function validateArchive(ZipArchive $zip): array
     {
