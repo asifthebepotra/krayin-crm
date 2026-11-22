@@ -213,3 +213,74 @@ Do not allow executable PHP, Composer scripts, arbitrary service providers or ro
 ## 12. Licensing and edition
 
 The Statamic v6.42.0 package manifest declares a proprietary license. Confirm commercial edition and production licensing requirements before release. Statamic Pro is required for the role/user management features we intend to use in the native Control Panel; confirm the exact entitlement and team-user terms for the intended deployment.
+
+
+## 10. Official Statamic 6 existing-Laravel installation guide
+
+The current official guide for installing Statamic 6 into an existing Laravel app confirms:
+
+- Statamic 6 supports Laravel 12 and 13.
+- Inertia 3 is not currently supported in Statamic 6; the app must use Inertia 2.
+- Add `Statamic\\Console\\Composer\\Scripts::preUpdateCmd` to `pre-update-cmd`.
+- Add `@php artisan statamic:install --ansi` to the existing `post-autoload-dump` script after Laravel's Composer scripts and package discovery.
+- Install `statamic/cms` through Composer.
+- Depending on the app's user setup, generate Statamic auth migrations with `php please auth:migration`.
+- An existing Laravel app does not receive a default pages collection, content entries, or views automatically. These must be configured manually.
+- Statamic uses flat-file content by default in this setup.
+- Statamic uses a catch-all public route, so an existing application catch-all route can prevent content routing.
+
+Official guide: https://statamic.dev/getting-started/installing/laravel
+
+## 11. Shared authentication and user-storage source details
+
+The pinned Statamic v6.42.0 source supports an Eloquent user repository whose model is chosen from the configured Control Panel guard's Laravel provider. Its `UserRepository::fromUser()` wraps generic Eloquent models as a Statamic user object. This makes Krayin's `Webkul\\User\\Models\\User` a plausible identity model.
+
+Relevant source:
+- `src/Auth/UserRepositoryManager.php`
+- `src/Auth/Eloquent/UserRepository.php`
+- `src/Auth/Eloquent/User.php`
+- `src/Providers/AuthServiceProvider.php`
+- `src/Http/Middleware/CP/AuthGuard.php`
+- `src/Http/Middleware/CP/Authorize.php`
+- `src/Providers/CpServiceProvider.php`
+- `config/users.php`
+- `config/cp.php`
+
+Statamic CP routes use their own middleware groups. The CP guard is selected from `statamic.users.guards.cp`; the native authorization middleware requires Statamic's `access cp` permission. The integration should use Krayin's `user` guard but keep the Statamic authorization pipeline intact.
+
+Statamic's Eloquent user adapter reads/writes preferences and updates `last_login`. The Krayin user schema audited for this project does not have those fields. Add them with integration-owned migrations and model casts, or explicitly disable functionality that would try to write unavailable fields.
+
+Statamic's role/group user pivots are configured separately from its role/group definitions. Keep role/group definitions file-backed at first and give the CMS pivots distinct table names. Do not point Statamic at Krayin's own `roles`, `groups` or `user_groups` tables.
+
+Official references:
+- [Statamic existing Laravel user/guard notes](https://statamic.dev/knowledge-base/tips/using-an-independent-authentication-guard)
+- [Statamic Eloquent user storage](https://statamic.dev/knowledge-base/tips/storing-users-in-a-database)
+
+## 12. Template and theme source details
+
+The pinned source shows:
+- `FrontendController` creates a Statamic `View` with a template and layout.
+- `Statamic\\View\\View` resolves template and layout handles through Laravel's view factory.
+- The Antlers engine renders the resolved view.
+- Partial and Include tags also use Laravel's view factory.
+
+This supports a theme-aware Laravel view-finder integration candidate while preserving Statamic's content and Antlers renderer. It does not prove a specific active-theme resolver is runtime-safe. Test nested partials, includes, cache, Live Preview and request isolation before implementation.
+
+The existing Statamic `Theme` tag is deprecated and is an asset helper, not a theme installer or active website theme manager. Statamic's CP ThemeController in this release returns marketplace information rather than installing arbitrary website template ZIP packages.
+
+Relevant source:
+- `src/Http/Controllers/FrontendController.php`
+- `src/View/View.php`
+- `src/View/Antlers/Engine.php`
+- `src/Tags/Theme.php`
+- `src/Http/Controllers/CP/Themes/ThemeController.php`
+
+The custom ZIP manager and active theme selection therefore remain integration responsibilities. Never execute PHP, Composer scripts, route providers or service providers supplied inside uploaded theme archives.
+
+## 13. Licensing
+
+Statamic's v6.42.0 package manifest declares a proprietary license. Confirm the selected edition and production licensing requirements before release. Multi-user role-based editing requires confirming the Statamic Pro entitlement and team-user terms with Statamic's current licensing documentation.
+
+## 14. Runtime status
+
+The source inspection supports a shared-guard prototype and a custom view-resolution prototype, but it does not establish that either works in the integrated app. Composer resolution, Control Panel boot, database migrations, shared login, permissions, inactive-user revocation and public rendering remain mandatory runtime gates.
