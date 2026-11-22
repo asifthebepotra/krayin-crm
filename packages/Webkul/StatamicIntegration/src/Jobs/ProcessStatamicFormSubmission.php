@@ -64,21 +64,23 @@ class ProcessStatamicFormSubmission implements ShouldQueue, ShouldBeUnique
             ]);
 
         try {
-            $leadId = $leadIntake->createLeadFromSubmission(
-                $this->formHandle,
-                $this->submissionId,
-                $this->payload
-            );
+            DB::transaction(function () use ($leadIntake): void {
+                $leadId = $leadIntake->createLeadFromSubmission(
+                    $this->formHandle,
+                    $this->submissionId,
+                    $this->payload
+                );
 
-            DB::table('cms_submission_logs')
-                ->where('statamic_submission_id', $this->submissionId)
-                ->update([
-                    'crm_lead_id' => $leadId,
-                    'status'      => 'completed',
-                    'processed_at'=> now(),
-                    'error_message' => null,
-                    'updated_at'  => now(),
-                ]);
+                DB::table('cms_submission_logs')
+                    ->where('statamic_submission_id', $this->submissionId)
+                    ->update([
+                        'crm_lead_id'   => $leadId,
+                        'status'        => 'completed',
+                        'processed_at'  => now(),
+                        'error_message' => null,
+                        'updated_at'    => now(),
+                    ]);
+            });
         } catch (Throwable $exception) {
             DB::table('cms_submission_logs')
                 ->where('statamic_submission_id', $this->submissionId)
