@@ -91,6 +91,18 @@ class StatamicIntegrationServiceProvider extends ServiceProvider
         config()->set('statamic.users.tables.groups', false);
 
         /*
+         * Website media uses its own public disk and directory. This keeps
+         * CMS assets separate from Krayin's CRM uploads and profile images.
+         */
+        config()->set('filesystems.disks.cms-assets', [
+            'driver' => 'local',
+            'root' => public_path('cms-assets'),
+            'url' => '/cms-assets',
+            'visibility' => 'public',
+            'throw' => false,
+        ]);
+
+        /*
          * Krayin's user table has no Statamic two-factor columns. Keep this
          * disabled until an explicit, reviewed migration adds that feature.
          */
