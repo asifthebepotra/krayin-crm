@@ -73,6 +73,7 @@ class ThemeInstaller
             }
 
             $this->validateExtractedFiles($staging);
+            $this->sanitizeSvgAssets($staging);
 
             File::ensureDirectoryExists(dirname($target));
 
@@ -191,17 +192,25 @@ class ThemeInstaller
             $normalized = $name;
             $trimmed = rtrim($normalized, '/');
 
-            if (isset($seenPaths[$normalized])) {
-                throw new RuntimeException("The theme archive contains a duplicate path [{$normalized}].");
+            $pathKey = strtolower($normalized);
+
+            if (isset($seenPaths[$pathKey])) {
+                throw new RuntimeException("The theme archive contains a duplicate or case-colliding path [{$normalized}].");
             }
 
-            $seenPaths[$normalized] = true;
+            $seenPaths[$pathKey] = true;
+
+            $segments = explode('/', $trimmed);
 
             if (
                 str_starts_with($normalized, '/')
                 || preg_match('/^[A-Za-z]:/', $normalized)
-                || in_array('..', explode('/', $trimmed), true)
-                || in_array('.', explode('/', $trimmed), true)
+                || preg_match('/[<>:"|?*\\x00-\\x1F]/', $normalized)
+                || in_array('', $segments, true)
+                || in_array('..', $segments, true)
+                || in_array('.', $segments, true)
+                || preg_match('/[. ]$/', end($segments))
+                || preg_match('/^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])(?:\\.|$)/i', end($segments))
             ) {
                 throw new RuntimeException('The theme archive contains an unsafe path.');
             }
@@ -290,6 +299,33 @@ class ThemeInstaller
         $extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
 
         return in_array($extension, self::ASSET_EXTENSIONS, true);
+    }
+
+ 
+    protected function sanitizeSvgAssets(string $directory): void
+    {
+        $assetsDirectory = $directory.'/assets';
+
+        if (! File::isDirectory($assetsDirectory)) {
+            return;
+        }
+
+        $sanitizer = new Sanitizer();
+        $sanitizer->removeRemoteReferences(true);
+
+        foreach (File::allFiles($assetsDirectory) as $file) {
+            if (strtolower($file->getExtension()) !== 'svg') {
+                continue;
+            }
+
+            $clean = $sanitizer->sanitize(File::get($file->getPathname()));
+
+            if ($clean === false) {
+                throw new RuntimeException("SVG asset [{$file->getRelativePathname()}] could not be sanitized.");
+            }
+
+            File::put($file->getPathname(), $clean);
+        }
     }
 
     protected function validateExtractedFiles(string $directory): void
