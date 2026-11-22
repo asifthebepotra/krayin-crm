@@ -3,8 +3,20 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="description" content="{{ seo_description ?? '' | sanitize }}">
-        <title>{{ seo_title ?? title ?? site:name | sanitize }}</title>
+        {{ if seo_description }}
+            <meta name="description" content="{{ seo_description | sanitize }}">
+        {{ else }}
+            <meta name="description" content="{{ cms_website:seo_description | sanitize }}">
+        {{ /if }}
+        {{ if seo_title }}
+            <title>{{ seo_title | sanitize }}</title>
+        {{ else }}
+            {{ if cms_website:seo_title }}
+                <title>{{ cms_website:seo_title | sanitize }}</title>
+            {{ else }}
+                <title>{{ title ?? cms_website:site_name | sanitize }}</title>
+            {{ /if }}
+        {{ /if }}
         <style>
             :root {
                 color-scheme: light;
@@ -39,7 +51,7 @@
     <body>
         <header class="site-header">
             <div class="site-header-inner">
-                <a class="site-brand" href="/">{{ site:name }}</a>
+                <a class="site-brand" href="/">{{ cms_website:site_name }}</a>
                 <nav class="site-nav" aria-label="Main navigation">
                     <a href="/">Home</a>
                     <a href="/blog">Blog</a>
@@ -54,7 +66,7 @@
 
         <footer class="site-footer">
             <div class="site-footer-inner">
-                © {{ now format="Y" }} {{ site:name }}
+                © {{ now format="Y" }} {{ cms_website:site_name }}
             </div>
         </footer>
     </body>
