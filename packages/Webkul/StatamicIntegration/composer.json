@@ -5,7 +5,8 @@
     "require": {
         "php": "^8.3",
         "statamic/cms": "6.42.0",
-        "inertiajs/inertia-laravel": "^2.0.7"
+        "inertiajs/inertia-laravel": "^2.0.7",
+        "enshrined/svg-sanitize": "^1.0.0"
     },
     "autoload": {
         "psr-4": {
