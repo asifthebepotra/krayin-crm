@@ -2,7 +2,10 @@
 
 namespace Webkul\StatamicIntegration\Providers;
 
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Statamic\Http\Controllers\FrontendController;
+use Webkul\StatamicIntegration\Console\Commands\InstallStarterContent;
 
 class StatamicIntegrationServiceProvider extends ServiceProvider
 {
@@ -29,6 +32,33 @@ class StatamicIntegrationServiceProvider extends ServiceProvider
 
         $this->loadViewsFrom(__DIR__.'/../Resources/views', 'statamic_integration');
 
+        $this->registerPublicHomepageRoute();
+
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                InstallStarterContent::class,
+            ]);
+        }
+
         $this->app->register(ModuleServiceProvider::class);
+    }
+
+    /**
+     * Krayin's front package registers "/" as a redirect to the CRM login.
+     * Once Statamic is installed, the public website must own the domain root.
+     * Its controller supplies Statamic's normal content lookup and middleware.
+     */
+    protected function registerPublicHomepageRoute(): void
+    {
+        if (
+            ! class_exists(FrontendController::class)
+            || ! config('statamic.routes.enabled', true)
+        ) {
+            return;
+        }
+
+        Route::middleware(config('statamic.routes.middleware', 'web'))
+            ->get('/', [FrontendController::class, 'index'])
+            ->name('statamic.site.root');
     }
 }
