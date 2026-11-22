@@ -345,3 +345,30 @@ The integration likely needs to deliberately override/suppress Krayin's `krayin.
 ## 15. Statamic API remains disabled in the first release
 
 The pinned Statamic configuration defaults `statamic.api.enabled` to false and its default route prefix is `api`. Krayin already has Laravel API routes under the API route group. Keep the Statamic Content API disabled for the initial release. If later enabled, configure an intentional prefix/middleware and test for route conflicts and public data exposure; do not expose Statamic user resources by default.
+
+
+## Local Composer dry-run result (user-provided terminal output, 2026-11-22)
+
+**Result: PASS — dependency solver completed without a reported conflict.**
+
+Top-level planned lock operations:
+- 35 installs
+- 12 updates
+- 0 removals
+
+Selected/resolved key versions:
+- `statamic/cms`: `v6.42.0`
+- `inertiajs/inertia-laravel`: `v2.0.28`
+- `laravel/framework`: `v12.73.0` (from `v12.71.0`)
+- `guzzlehttp/guzzle`: `7.16.5` (from `7.16.1`)
+- Symfony HttpFoundation remains `v7.4.23`.
+
+The dry-run output reported no removals and no dependency-resolution error. It also showed `Package operations: 226 installs` while installing from the lock file; the local checkout has no `vendor/` directory, so the actual installation would need to populate vendor. This does not mean 226 new packages were added to the lock plan; the top-level delta is 35 installs, 12 updates, zero removals.
+
+Composer validation warnings:
+- Exact `6.42.0` is intentionally pinned for this reproducible audit; the warning is advisory.
+- The lock file is expected to be out of date because `composer require --no-update` changed `composer.json` without updating `composer.lock`.
+
+The attempted `php artisan config:clear` failed because `vendor/autoload.php` does not exist yet. This is expected for a fresh checkout with no dependencies installed; Artisan commands must wait until Composer creates `vendor/`.
+
+**Next gate:** add Statamic's documented Composer hooks while preserving Krayin's existing scripts, validate JSON/Composer configuration, then perform the actual dependency update on this audit branch. Do not run migrations or implement custom integration code yet.
