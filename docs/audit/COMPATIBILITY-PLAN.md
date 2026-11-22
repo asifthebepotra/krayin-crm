@@ -330,3 +330,10 @@ Because the product's public website is intended to own the domain root, add the
 - [ ] The same results hold with route caching enabled.
 
 The integration likely needs to deliberately override/suppress Krayin's `krayin.home` route after provider route registration, but the exact implementation must be proven with the route collection and HTTP tests. This is a mandatory design decision, not an optional polish item.
+
+
+
+
+## 15. Statamic API remains disabled in the first release
+
+The pinned Statamic configuration defaults `statamic.api.enabled` to false and its default route prefix is `api`. Krayin already has Laravel API routes under the API route group. Keep the Statamic Content API disabled for the initial release. If later enabled, configure an intentional prefix/middleware and test for route conflicts and public data exposure; do not expose Statamic user resources by default.
