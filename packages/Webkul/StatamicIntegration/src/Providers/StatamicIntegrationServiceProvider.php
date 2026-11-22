@@ -40,6 +40,15 @@ class StatamicIntegrationServiceProvider extends ServiceProvider
         if (class_exists(Statamic::class)) {
             config()->set('auth.providers.users.model', CmsUser::class);
 
+            /*
+             * The integration registers Statamic's public frontend after
+             * Krayin's explicit root redirect. Keep Statamic's action routes
+             * and Control Panel; only disable its own public catch-all.
+             */
+            if (config('statamic_integration.public_routes_enabled', true)) {
+                config()->set('statamic.routes.enabled', false);
+            }
+
             Auth::forgetGuards();
         }
     }
@@ -136,13 +145,26 @@ class StatamicIntegrationServiceProvider extends ServiceProvider
     {
         if (
             ! class_exists(FrontendController::class)
-            || ! config('statamic.routes.enabled', true)
+            || ! config('statamic_integration.public_routes_enabled', true)
         ) {
             return;
         }
 
+        /*
+         * Preserve routes registered by Statamic addons, then register the
+         * exact homepage before the frontend catch-all. Krayin has already
+         * registered its "/" redirect by the time this provider boots.
+         */
+        Statamic::additionalWebRoutes();
+
         Route::middleware(config('statamic.routes.middleware', 'web'))
-            ->get('/', [FrontendController::class, 'index'])
-            ->name('statamic.site.root');
+            ->group(function () {
+                Route::get('/', [FrontendController::class, 'index'])
+                    ->name('statamic.site.root');
+
+                Route::any('/{segments?}', [FrontendController::class, 'index'])
+                    ->where('segments', Statamic::frontendRouteSegmentRegex())
+                    ->name('statamic.site');
+            });
     }
 }
