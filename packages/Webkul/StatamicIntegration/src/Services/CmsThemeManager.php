@@ -11,6 +11,10 @@ class CmsThemeManager
 {
     public function activeTheme(): ?CmsThemeInstallation
     {
+        if (! Schema::hasTable('cms_website_settings') || ! Schema::hasTable('cms_theme_installations')) {
+            return null;
+        }
+
         $settings = DB::table('cms_website_settings')->where('id', 1)->first();
 
         if (! $settings?->active_theme_slug || ! $settings?->active_theme_version) {
@@ -24,6 +28,10 @@ class CmsThemeManager
 
     public function activate(CmsThemeInstallation $theme): void
     {
+        if (! Schema::hasTable('cms_website_settings')) {
+            throw new RuntimeException('Run the CMS database migrations before activating a theme.');
+        }
+
         $viewsPath = storage_path('app/'.$theme->install_path.'/views');
 
         if (! File::isDirectory($viewsPath)) {
