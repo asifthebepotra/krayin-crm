@@ -24,6 +24,10 @@ Route::middleware(['web', 'admin_locale', 'user'])
             ->whereNumber('theme')
             ->name('cms.themes.preview');
 
+        Route::get('cms/themes/{theme}/preview', [CmsThemeController::class, 'preview'])
+            ->whereNumber('theme')
+            ->name('cms.themes.preview');
+
         Route::post('cms/themes/{theme}/activate', [CmsThemeController::class, 'activate'])
             ->whereNumber('theme')
             ->name('cms.themes.activate');
