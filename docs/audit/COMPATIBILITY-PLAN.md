@@ -185,7 +185,7 @@ This section supersedes any shorter generic Composer example above. It reflects 
 
 ### 10.1 Work only on the audit branch
 
-- Confirm the current branch is `audit/SA-01-krayin-statamic-compatibility`.
+- Confirm the current branch is `audit/SA-01-krayin-statamic-compatibility-clean`.
 - Confirm `composer.json` and `composer.lock` are clean before editing.
 - Preserve an untouched baseline copy of both files or a Git commit.
 - Do not run dependency installation on `main` or the local `master` branch.
