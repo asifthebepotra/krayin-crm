@@ -24,6 +24,7 @@ use Webkul\Tag\Providers\TagServiceProvider;
 use Webkul\User\Providers\UserServiceProvider;
 use Webkul\Warehouse\Providers\WarehouseServiceProvider;
 use Webkul\WebForm\Providers\WebFormServiceProvider;
+use Webkul\StatamicIntegration\Providers\StatamicIntegrationServiceProvider;
 
 return [
     /*
@@ -61,4 +62,5 @@ return [
     UserServiceProvider::class,
     WarehouseServiceProvider::class,
     WebFormServiceProvider::class,
+    StatamicIntegrationServiceProvider::class,
 ];
