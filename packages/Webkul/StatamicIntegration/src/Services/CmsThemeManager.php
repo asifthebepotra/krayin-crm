@@ -54,6 +54,21 @@ class CmsThemeManager
         DB::table('cms_website_settings')->updateOrInsert(['id' => 1], $values);
     }
 
+    public function deactivate(): void
+    {
+        if (! Schema::hasTable('cms_website_settings')) {
+            throw new RuntimeException('Run the CMS database migrations before changing the active theme.');
+        }
+
+        DB::table('cms_website_settings')
+            ->where('id', 1)
+            ->update([
+                'active_theme_slug' => null,
+                'active_theme_version' => null,
+                'updated_at' => now(),
+            ]);
+    }
+
     public function uninstall(CmsThemeInstallation $theme): void
     {
         $active = $this->activeTheme();
