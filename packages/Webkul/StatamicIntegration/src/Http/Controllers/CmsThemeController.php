@@ -14,8 +14,11 @@ class CmsThemeController extends Controller
     public function index(CmsThemeManager $manager)
     {
         return view('statamic_integration::themes.index', [
-            'themes' => CmsThemeInstallation::orderBy('name')->orderByDesc('installed_at')->get(),
+            'themes' => Schema::hasTable('cms_theme_installations')
+                ? CmsThemeInstallation::orderBy('name')->orderByDesc('installed_at')->get()
+                : collect(),
             'activeTheme' => $manager->activeTheme(),
+            'tablesReady' => Schema::hasTable('cms_theme_installations') && Schema::hasTable('cms_website_settings'),
         ]);
     }
 
