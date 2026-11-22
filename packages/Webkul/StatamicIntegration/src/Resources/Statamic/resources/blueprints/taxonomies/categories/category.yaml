@@ -1,0 +1,11 @@
+title: Category
+sections:
+  main:
+    display: Category
+    fields:
+      -
+        handle: description
+        field:
+          type: textarea
+          display: Description
+          rows: 3
