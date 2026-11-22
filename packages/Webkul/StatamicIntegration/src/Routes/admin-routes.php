@@ -14,6 +14,12 @@ Route::middleware(['web', 'admin_locale', 'user'])
         Route::get('cms/open', [CmsController::class, 'open'])
             ->name('cms.open');
 
+        Route::get('cms/settings', [CmsWebsiteSettingsController::class, 'index'])
+            ->name('cms.settings.index');
+
+        Route::put('cms/settings', [CmsWebsiteSettingsController::class, 'update'])
+            ->name('cms.settings.update');
+
         Route::get('cms/themes', [CmsThemeController::class, 'index'])
             ->name('cms.themes.index');
 
