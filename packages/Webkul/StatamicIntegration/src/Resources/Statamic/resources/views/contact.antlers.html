@@ -1,0 +1,67 @@
+<section style="max-width: 760px; margin: 0 auto;">
+    <header style="margin-bottom: 34px;">
+        <p style="margin: 0 0 12px; color: #0b8067; font-size: 13px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;">
+            Get in touch
+        </p>
+        <h1 style="margin: 0 0 14px; color: #102a25; font-size: clamp(38px, 6vw, 58px); letter-spacing: -.04em;">
+            {{ title }}
+        </h1>
+        <div class="content" style="color: #53636d;">
+            {{ content }}
+        </div>
+    </header>
+
+    {{ if {form:success in="contact"} }}
+        <div role="status" style="margin-bottom: 22px; padding: 16px; border: 1px solid #86c7aa; border-radius: 8px; background: #effaf4; color: #145c3a;">
+            Thank you. Your enquiry has been received.
+        </div>
+    {{ /if }}
+
+    {{ form:create in="contact" }}
+        <div style="display: grid; gap: 18px; padding: 28px; border: 1px solid #e0e6e8; border-radius: 12px; background: #fff;">
+            {{ if errors }}
+                <div role="alert" style="padding: 12px; border-radius: 7px; background: #fff1f1; color: #9c2525;">
+                    Please check the form fields and try again.
+                </div>
+            {{ /if }}
+
+            <label style="display: grid; gap: 7px;">
+                <span style="color: #273943; font-size: 14px; font-weight: 650;">Name</span>
+                <input name="name" type="text" value="{{ old:name }}" required maxlength="150" autocomplete="name" style="min-height: 46px; padding: 10px 12px; border: 1px solid #cfd8dc; border-radius: 7px;">
+                {{ if errors:name }}
+                    <span style="color: #b42318; font-size: 12px;">{{ errors:name.0 }}</span>
+                {{ /if }}
+            </label>
+
+            <label style="display: grid; gap: 7px;">
+                <span style="color: #273943; font-size: 14px; font-weight: 650;">Email</span>
+                <input name="email" type="email" value="{{ old:email }}" required maxlength="190" autocomplete="email" style="min-height: 46px; padding: 10px 12px; border: 1px solid #cfd8dc; border-radius: 7px;">
+                {{ if errors:email }}
+                    <span style="color: #b42318; font-size: 12px;">{{ errors:email.0 }}</span>
+                {{ /if }}
+            </label>
+
+            <label style="display: grid; gap: 7px;">
+                <span style="color: #273943; font-size: 14px; font-weight: 650;">Phone <span style="color: #7b8790; font-weight: 400;">(optional)</span></span>
+                <input name="phone" type="tel" value="{{ old:phone }}" maxlength="50" autocomplete="tel" style="min-height: 46px; padding: 10px 12px; border: 1px solid #cfd8dc; border-radius: 7px;">
+            </label>
+
+            <label style="display: grid; gap: 7px;">
+                <span style="color: #273943; font-size: 14px; font-weight: 650;">Company <span style="color: #7b8790; font-weight: 400;">(optional)</span></span>
+                <input name="company" type="text" value="{{ old:company }}" maxlength="190" autocomplete="organization" style="min-height: 46px; padding: 10px 12px; border: 1px solid #cfd8dc; border-radius: 7px;">
+            </label>
+
+            <label style="display: grid; gap: 7px;">
+                <span style="color: #273943; font-size: 14px; font-weight: 650;">Message</span>
+                <textarea name="message" rows="6" required maxlength="10000" style="padding: 10px 12px; border: 1px solid #cfd8dc; border-radius: 7px;">{{ old:message }}</textarea>
+                {{ if errors:message }}
+                    <span style="color: #b42318; font-size: 12px;">{{ errors:message.0 }}</span>
+                {{ /if }}
+            </label>
+
+            <button type="submit" style="display: inline-flex; justify-content: center; align-items: center; min-height: 46px; padding: 0 20px; border: 0; border-radius: 7px; background: #075a47; color: #fff; font-size: 14px; font-weight: 650; cursor: pointer;">
+                Send enquiry
+            </button>
+        </div>
+    {{ /form:create }}
+</section>
