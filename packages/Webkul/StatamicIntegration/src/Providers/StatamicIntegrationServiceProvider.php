@@ -109,9 +109,16 @@ class StatamicIntegrationServiceProvider extends ServiceProvider
         config()->set('statamic.users.two_factor_enabled', false);
         config()->set('statamic.users.wizard_invitation', false);
 
-        $this->app->make(Router::class)->prependMiddlewareToGroup(
+        $router = $this->app->make(Router::class);
+
+        $router->prependMiddlewareToGroup(
             'statamic.cp.authenticated',
             EnsureKrayinCmsUserIsActive::class
+        );
+
+        $router->pushMiddlewareToGroup(
+            config('statamic.routes.middleware', 'web'),
+            ApplyActiveStatamicTheme::class
         );
     }
 
