@@ -48,3 +48,18 @@
 | Licensing | PENDING | Edition and commercial terms confirmation required |
 
 Final status can be changed to GO only after evidence is attached for every mandatory gate. A source inspection or a successful Composer dry run alone is insufficient.
+
+
+
+## Additional source-level conclusion
+
+A source-supported shared-login candidate now exists: set Statamic's Control Panel guard to Krayin's `user` guard and configure Statamic's Eloquent user repository to resolve the model from that guard's provider. Statamic v6.42.0's Eloquent user repository explicitly wraps arbitrary Laravel Eloquent models, and its CP login flow uses the configured current guard.
+
+This still requires a runtime prototype. The major blockers to verify are:
+- Statamic CMS role/group pivots need their own table names and migrations, separate from Krayin's role/group structures.
+- Krayin's `users` schema lacks Statamic preference, last-login and two-factor columns accessed by the Statamic Eloquent adapter.
+- Krayin's `status` enforcement is not automatically applied to Statamic CP routes; a dedicated active-user middleware is required.
+- Statamic user creation must be disabled/restricted because it writes directly to the configured Eloquent user model and could bypass Krayin's required `role_id`.
+- Theme ZIP installation and active website theme resolution are custom features; Statamic's deprecated Theme tag is only an asset helper, not a full website theme manager.
+
+These are design candidates and implementation constraints, not a GO decision. Composer/runtime gates remain pending.
