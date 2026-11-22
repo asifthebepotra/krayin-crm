@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ seo_title ?? title ?? cms_website:site_name }}</title>
+    <link rel="stylesheet" href="{{ cms_theme:asset path='css/site.css' }}">
+</head>
+<body>
+    <header class="corporate-header">
+        <a href="/">{{ cms_website:site_name }}</a>
+        <nav>
+            <a href="/">Home</a>
+            <a href="/blog">Blog</a>
+            <a href="/contact">Contact</a>
+        </nav>
+    </header>
+
+    <main class="corporate-main">{{ template_content }}</main>
+
+    <footer class="corporate-footer">© {{ now format="Y" }} {{ cms_website:site_name }}</footer>
+</body>
+</html>
