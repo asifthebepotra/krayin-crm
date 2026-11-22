@@ -173,6 +173,7 @@ class ThemeInstaller
         }
 
         $entries = [];
+        $seenPaths = [];
         $totalSize = 0;
         $hasTemplate = false;
 
