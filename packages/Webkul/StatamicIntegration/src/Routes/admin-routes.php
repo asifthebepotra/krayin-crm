@@ -26,6 +26,9 @@ Route::middleware(['web', 'admin_locale', 'user'])
         Route::post('cms/themes', [CmsThemeController::class, 'store'])
             ->name('cms.themes.store');
 
+        Route::post('cms/themes/deactivate', [CmsThemeController::class, 'deactivate'])
+            ->name('cms.themes.deactivate');
+
         Route::get('cms/themes/{theme}/preview', [CmsThemeController::class, 'preview'])
             ->whereNumber('theme')
             ->name('cms.themes.preview');
