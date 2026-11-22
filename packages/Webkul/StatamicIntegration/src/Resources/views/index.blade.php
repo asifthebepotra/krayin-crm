@@ -165,6 +165,15 @@
                     </a>
 
                     <a
+                        href="{{ route('admin.cms.submissions.index') }}"
+                        class="rounded-md border border-gray-200 p-4 transition hover:border-blue-400 dark:border-gray-700"
+                    >
+                        <span class="font-medium text-gray-900 dark:text-white">
+                            Website Submissions
+                        </span>
+                    </a>
+
+                    <a
                         href="{{ route('admin.cms.themes.index') }}"
                         class="rounded-md border border-gray-200 p-4 transition hover:border-blue-400 dark:border-gray-700"
                     >
