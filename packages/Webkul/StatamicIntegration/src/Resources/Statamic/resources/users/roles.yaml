@@ -35,5 +35,12 @@ cms-administrator:
     - configure navs
     - configure globals
     - configure asset containers
+    - view assets assets
+    - upload assets assets
+    - edit assets folders
+    - edit assets assets
+    - move assets assets
+    - rename assets assets
+    - delete assets assets
     - configure forms
     - view contact form submissions
