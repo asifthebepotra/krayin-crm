@@ -67,7 +67,11 @@ class ApplyActiveStatamicTheme
 
             abort_unless($cmsUser && $cmsUser->hasPermission('access cp'), 403);
 
-            return CmsThemeInstallation::findOrFail((int) $request->query('cms_theme_preview'));
+            $theme = CmsThemeInstallation::findOrFail((int) $request->query('cms_theme_preview'));
+
+            $request->attributes->set('cms_theme_preview', $theme);
+
+            return $theme;
         }
 
         if (! DB::getSchemaBuilder()->hasTable('cms_website_settings')) {
