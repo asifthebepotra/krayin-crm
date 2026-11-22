@@ -92,3 +92,124 @@ The package manifest declares license=proprietary. Confirm the appropriate Stata
 | Licensing entitlement confirmed | PENDING |
 
 **Conclusion:** Statamic v6.42.0 has a declared dependency intersection with the Krayin v2.2.8 Laravel 12.71.0 baseline. Runtime compatibility remains unproven until the combined Composer installation and application tests pass.
+
+## 10. Deeper authentication and role source audit (v6.42.0)
+
+### 10.1 Direct Eloquent user wrapping is supported
+
+The pinned Statamic `UserRepositoryManager::createEloquentDriver()` chooses the Eloquent model from:
+
+- `statamic.users.guards.cp`
+- `auth.guards.<selected-guard>.provider`
+- `auth.providers.<provider>.model`
+
+Statamic's `AuthEloquentUserRepository::fromUser()` accepts an existing `StatamicContractsAuthUser`, a model exposing `toStatamicUser()`, or a generic `IlluminateDatabaseEloquentModel`. A normal Eloquent Krayin User model therefore qualifies for the generic wrapper.
+
+The native CP middleware `AuthGuard` sets Laravel's default guard using `statamic.users.guards.cp`. The Statamic CP login controller uses Laravel's current default guard, and its `Authorize` middleware checks the Statamic permission `access cp` through the Statamic user facade/Gate. This gives us a plausible supported configuration:
+
+- Statamic repository: `eloquent`.
+- Statamic CP guard: Krayin's `user` guard.
+- Laravel `user` guard provider model: Krayin's `Webkul\\User\\Models\\User`.
+- Statamic converts the authenticated Krayin model to its own Eloquent User wrapper.
+
+With the same Laravel session and guard, the intended outcome is one identity and one login session, not duplicate passwords. The CP guard setting must be applied before resolving the Statamic user on CP requests. This is a source-backed design candidate, not yet a runtime pass.
+
+### 10.2 Keep CMS permissions separate from Krayin CRM permissions
+
+Statamic's own permission Gate adapter calls `User::fromUser($user)`, then checks the Statamic user's `isSuper()` and `hasPermission()`. The default Statamic Eloquent User obtains its permissions through Statamic role and user-group relationships.
+
+Krayin's `role_id` and `hasPermission()` are a different permission model. Do not map every Krayin permission string directly to Statamic permission names.
+
+The least invasive design candidate is:
+- Krayin continues to own login identity, user status and CRM roles.
+- Statamic continues to own CMS permission definitions and CMS roles.
+- Existing Krayin user IDs are reused by Statamic's Eloquent user adapter.
+- Statamic role/group pivot tables use distinct configured table names, not Krayin's `user_groups`.
+- CMS roles are assigned only to existing Krayin users.
+- Krayin CRM ACL and Statamic CMS ACL remain independent.
+
+### 10.3 Statamic's native CP authorization sequence
+
+Statamic's Control Panel provider defines:
+- `statamic.cp`: session, CSRF, Inertia, default guard selection and request setup.
+- `statamic.cp.authenticated`: session authentication, localization, Statamic `Authorize`, site selection, permissions and preferences boot.
+
+The Statamic `Authorize` middleware checks `User::current()` and requires `access cp`. Krayin's route-name Bouncer is not part of this middleware group and should not be added indiscriminately.
+
+### 10.4 User-storage and migration cautions
+
+The pinned Statamic `config/users.php` defaults to the Eloquent repository, with `users` as its user table, `role_user` and `group_user` as relationship pivot tables, and file-backed roles/groups when their table settings are false.
+
+For this Krayin application:
+- Reuse the existing `users` table and the Krayin `user` guard.
+- Keep Statamic role/group definitions file-backed initially to avoid Krayin's `roles` and `groups` tables.
+- Configure separate pivot names such as `statamic_role_user` and `statamic_group_user`.
+- Confirm required pivot schema and migrations in runtime.
+- Add or deliberately disable Statamic user fields absent from Krayin's users table, especially `preferences`, `last_login` and two-factor fields.
+- Do not let Statamic's native user-create flow create new CRM users. Krayin remains the account source of truth.
+
+Statamic's native user edit flow can also write profile data to the underlying Eloquent model. Make name/email read-only or restrict the Users area so CRM identity fields remain managed from Krayin. CMS role assignment for existing users may be permitted after tests.
+
+### 10.5 Account status is a separate authorization requirement
+
+Krayin's Bouncer checks the `status` flag and invalidates sessions for disabled users on Krayin admin routes. Statamic's own CP authorization checks Statamic permissions; it does not automatically run Krayin's Bouncer. Add a dedicated middleware to the authenticated Statamic CP pipeline that rejects/invalidate sessions for a disabled Krayin user.
+
+### 10.6 Runtime prototype required
+
+Test this exact path before deciding the bridge:
+1. Sign into Krayin through the `user` guard.
+2. Open Statamic `/cp` in the same browser session without a second login.
+3. Confirm Statamic resolves the same Krayin user ID.
+4. Confirm Statamic can evaluate `access cp` using a CMS role.
+5. Confirm Krayin CRM permissions remain unchanged.
+6. Disable the Krayin user and confirm the next CP request is denied and the session is invalidated.
+7. Confirm Statamic user CRUD cannot create a Krayin account with missing `role_id`.
+8. Confirm any user profile/permission update does not corrupt CRM user records.
+
+## 11. Deeper template and theme source audit (v6.42.0)
+
+### 11.1 Native website rendering
+
+The pinned Statamic `FrontendController` creates a `Statamic\\View\\View` from a template handle and layout. The Statamic view resolves:
+- templates through `templates.<handle>` when present, otherwise the given handle;
+- layouts through `layouts.<handle>` when present, otherwise the given handle.
+
+Rendering ultimately goes through Laravel's view factory/finder and the Statamic Antlers engine. Partial/include tags also resolve Laravel views.
+
+This provides a viable extension point for a single active website theme: a theme-aware Laravel view-finder/path strategy can supply the active theme's templates, layouts and partials while keeping Statamic's content/rendering pipeline intact. It must be tested for nested partials, includes, layouts, Live Preview and cache behaviour. Do not replace Statamic's FrontendController or Antlers engine.
+
+### 11.2 What Statamic's existing Theme class does not provide
+
+The Statamic v6.42.0 `Theme` tag is deprecated and is an asset-path helper. It does not provide an active website theme registry, ZIP theme installation or template switching. The CP Themes controller in this release returns marketplace theme data; it is not a website template package manager.
+
+Therefore our ZIP theme installer and active website theme selection remain custom integration functionality. Treat this as a managed template package, not arbitrary executable code.
+
+### 11.3 Theme architecture candidate
+
+A theme ZIP can contain:
+- `theme.json` manifest and preview image;
+- Antlers `templates/`, `layouts/` and `partials/`;
+- static assets;
+- optional documented blueprint/field configuration.
+
+The installer validates the archive and extracts to a controlled directory. A custom theme-aware view finder makes that directory active for public rendering. Assets are served from a controlled `public/themes/<slug>/` path using a custom asset helper/tag or explicit Vite integration; do not depend on the deprecated Statamic Theme tag for active theme management.
+
+Because changing Laravel view-finder locations on a singleton can leak state between requests in long-lived workers, the implementation must either use a request-aware finder or reliably scope/reset the active theme context. The initial PHP-FPM prototype still needs the same correctness tests.
+
+Do not allow executable PHP, Composer scripts, arbitrary service providers or route registration inside uploaded theme ZIPs.
+
+### 11.4 Theme acceptance test
+
+- Install a test theme ZIP.
+- Activate it without changing content entries.
+- Render a page with the theme's template and layout.
+- Render nested partials/includes from the same active theme.
+- Verify theme assets return successfully.
+- Preview before activation.
+- Reject traversal, symlink and executable payloads.
+- Roll back to the previous theme.
+- Verify inactive theme removal does not delete content or assets shared by another active package.
+
+## 12. Licensing and edition
+
+The Statamic v6.42.0 package manifest declares a proprietary license. Confirm commercial edition and production licensing requirements before release. Statamic Pro is required for the role/user management features we intend to use in the native Control Panel; confirm the exact entitlement and team-user terms for the intended deployment.
