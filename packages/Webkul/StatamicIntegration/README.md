@@ -32,6 +32,7 @@ The module respects the configurable `APP_ADMIN_PATH`.
 - `GET {APP_ADMIN_PATH}/cms/open` — opens the native Statamic Control Panel.
 - `GET {APP_ADMIN_PATH}/cms/settings` — website identity and SEO defaults.
 - `GET {APP_ADMIN_PATH}/cms/themes` — install and manage website themes.
+- `GET {APP_ADMIN_PATH}/cms/submissions` — review Statamic form processing logs.
 
 ## First installation
 
@@ -183,7 +184,8 @@ Implemented in this feature branch:
 - Pages, Blog, Contact and Website Media structures.
 - Statamic form submissions to Krayin lead creation with retry/idempotency records.
 - Website settings and public Antlers tags.
-- ZIP theme upload, validation, preview, activation, deactivation and removal.
+- ZIP theme upload, validation, signed preview, activation, built-in fallback and removal.
 - Theme asset Antlers helper and active theme template resolution.
+- Submission logs showing status, attempts and linked CRM lead IDs.
 
 The package has not yet been installed or executed in the local WAMP runtime. Composer resolution, database migrations, authentication, form processing, theme preview/rendering and regression tests still need to be run on the local feature branch before production use.
