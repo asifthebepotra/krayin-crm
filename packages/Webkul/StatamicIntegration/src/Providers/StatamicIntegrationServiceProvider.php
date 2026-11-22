@@ -59,8 +59,6 @@ class StatamicIntegrationServiceProvider extends ServiceProvider
 
         Event::listen(SubmissionCreated::class, QueueStatamicFormSubmission::class);
 
-        $this->registerPublicHomepageRoute();
-
         if ($this->app->runningInConsole()) {
             $this->commands([
                 InstallStarterContent::class,
@@ -69,6 +67,8 @@ class StatamicIntegrationServiceProvider extends ServiceProvider
 
         $this->app->booted(function () {
             $this->configureStatamicIdentity();
+
+            $this->registerPublicHomepageRoute();
         });
 
         $this->app->register(ModuleServiceProvider::class);
