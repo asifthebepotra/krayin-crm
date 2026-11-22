@@ -51,6 +51,8 @@ class StatamicIntegrationServiceProvider extends ServiceProvider
 
         $this->loadMigrationsFrom(__DIR__.'/../Database/Migrations');
 
+        Event::listen(SubmissionCreated::class, QueueStatamicFormSubmission::class);
+
         $this->registerPublicHomepageRoute();
 
         if ($this->app->runningInConsole()) {
