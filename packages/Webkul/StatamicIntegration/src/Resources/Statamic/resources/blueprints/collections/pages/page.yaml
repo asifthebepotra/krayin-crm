@@ -1,0 +1,46 @@
+title: Page
+sections:
+  main:
+    display: Page Content
+    fields:
+      -
+        handle: hero_heading
+        field:
+          type: text
+          display: Hero Heading
+      -
+        handle: hero_text
+        field:
+          type: textarea
+          display: Hero Description
+          rows: 3
+      -
+        handle: content
+        field:
+          type: bard
+          display: Content
+          buttons:
+            - h2
+            - h3
+            - bold
+            - italic
+            - unorderedlist
+            - orderedlist
+            - quote
+            - link
+  seo:
+    display: SEO
+    fields:
+      -
+        handle: seo_title
+        field:
+          type: text
+          display: Meta Title
+          character_limit: 60
+      -
+        handle: seo_description
+        field:
+          type: textarea
+          display: Meta Description
+          character_limit: 160
+          rows: 3
