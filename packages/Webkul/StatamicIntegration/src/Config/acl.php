@@ -7,6 +7,7 @@ return [
         'route' => [
             'admin.cms.index',
             'admin.cms.open',
+            'admin.cms.submissions.index',
             'admin.cms.settings.index',
             'admin.cms.settings.update',
             'admin.cms.themes.index',
