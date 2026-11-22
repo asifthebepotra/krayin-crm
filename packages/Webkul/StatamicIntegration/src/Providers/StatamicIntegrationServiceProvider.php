@@ -4,12 +4,15 @@ namespace Webkul\StatamicIntegration\Providers;
 
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Statamic\Events\SubmissionCreated;
 use Statamic\Http\Controllers\FrontendController;
 use Statamic\Statamic;
 use Webkul\StatamicIntegration\Console\Commands\InstallStarterContent;
 use Webkul\StatamicIntegration\Http\Middleware\EnsureKrayinCmsUserIsActive;
+use Webkul\StatamicIntegration\Listeners\QueueStatamicFormSubmission;
 use Webkul\StatamicIntegration\Models\CmsUser;
 
 class StatamicIntegrationServiceProvider extends ServiceProvider
