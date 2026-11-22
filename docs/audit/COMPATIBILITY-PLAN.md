@@ -312,3 +312,21 @@ Statamic relies on a catch-all frontend route. Verify Krayin has no earlier catc
 ## 13. Licensing gate
 
 The Statamic core package declares a proprietary license. Confirm the required Statamic edition and commercial terms before production, especially because a multi-user CMS with role-based access is part of the intended product.
+
+
+
+## 14. Additional mandatory route-collision test: public root URL
+
+The source audit confirmed that Krayin registers an explicit `GET /` route named `krayin.home` which redirects to the CRM login. Statamic registers its public frontend using an optional catch-all route `/{segments?}`.
+
+Because the product's public website is intended to own the domain root, add these release-blocking tests:
+
+- [ ] `GET /` returns the Statamic homepage, not a redirect to Krayin login.
+- [ ] The homepage is rendered through Statamic's native FrontendController/Antlers pipeline.
+- [ ] `GET /<page-slug>` renders a published Statamic page.
+- [ ] `GET /<APP_ADMIN_PATH>/login` still opens Krayin login.
+- [ ] Krayin's explicit admin and API routes remain unchanged.
+- [ ] Statamic's action/CP routes remain unaffected.
+- [ ] The same results hold with route caching enabled.
+
+The integration likely needs to deliberately override/suppress Krayin's `krayin.home` route after provider route registration, but the exact implementation must be proven with the route collection and HTTP tests. This is a mandatory design decision, not an optional polish item.
