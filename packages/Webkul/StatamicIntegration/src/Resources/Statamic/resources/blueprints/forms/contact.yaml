@@ -1,0 +1,49 @@
+title: Contact Form
+sections:
+  main:
+    display: Contact Details
+    fields:
+      -
+        handle: name
+        field:
+          type: text
+          display: Name
+          validate:
+            - required
+            - string
+            - max:150
+      -
+        handle: email
+        field:
+          type: text
+          display: Email
+          input_type: email
+          validate:
+            - required
+            - email
+            - max:190
+      -
+        handle: phone
+        field:
+          type: text
+          display: Phone
+          validate:
+            - nullable
+            - max:50
+      -
+        handle: company
+        field:
+          type: text
+          display: Company
+          validate:
+            - nullable
+            - max:190
+      -
+        handle: message
+        field:
+          type: textarea
+          display: Message
+          validate:
+            - required
+            - string
+            - max:10000
