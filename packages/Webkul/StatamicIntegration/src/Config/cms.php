@@ -5,10 +5,6 @@ return [
     |--------------------------------------------------------------------------
     | Statamic Control Panel
     |--------------------------------------------------------------------------
-    |
-    | The Statamic package owns the actual CP route. This value is used as
-    | a fallback while the Statamic configuration has not been published.
-    |
     */
     'control_panel_path' => env('CP_ROUTE', 'cp'),
 
@@ -30,4 +26,35 @@ return [
     |
     */
     'content_api_enabled' => false,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Statamic Forms -> Krayin CRM
+    |--------------------------------------------------------------------------
+    |
+    | Each enabled form maps its own Statamic field handles to the standard
+    | CRM intake fields. Set enabled to false to store submissions in
+    | Statamic without creating a Krayin lead.
+    |
+    */
+    'forms' => [
+        'contact' => [
+            'enabled' => true,
+            'create_lead' => true,
+            'field_map' => [
+                'name' => 'name',
+                'email' => 'email',
+                'phone' => 'phone',
+                'company' => 'company',
+                'message' => 'message',
+            ],
+            'lead_title_prefix' => 'Website enquiry',
+            'source_name' => 'Website',
+            'type_name' => null,
+            'pipeline_id' => null,
+            'source_id' => null,
+            'type_id' => null,
+            'owner_id' => null,
+        ],
+    ],
 ];
