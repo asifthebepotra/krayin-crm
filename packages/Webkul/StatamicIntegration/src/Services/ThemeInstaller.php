@@ -184,8 +184,18 @@ class ThemeInstaller
                 throw new RuntimeException('The theme archive contains an invalid path.');
             }
 
-            $normalized = str_replace('\\', '/', $name);
+            if (str_contains($name, '\\\\')) {
+                throw new RuntimeException('Theme archive paths must use forward slashes.');
+            }
+
+            $normalized = $name;
             $trimmed = rtrim($normalized, '/');
+
+            if (isset($seenPaths[$normalized])) {
+                throw new RuntimeException("The theme archive contains a duplicate path [{$normalized}].");
+            }
+
+            $seenPaths[$normalized] = true;
 
             if (
                 str_starts_with($normalized, '/')
