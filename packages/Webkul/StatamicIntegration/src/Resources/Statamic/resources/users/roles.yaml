@@ -1,0 +1,39 @@
+cms-administrator:
+  title: CMS Administrator
+  permissions:
+    - access cp
+    - manage preferences
+    - configure sites
+    - configure fields
+    - configure collections
+    - view pages entries
+    - edit pages entries
+    - create pages entries
+    - delete pages entries
+    - publish pages entries
+    - reorder pages entries
+    - edit other authors pages entries
+    - publish other authors pages entries
+    - delete other authors pages entries
+    - view blog entries
+    - edit blog entries
+    - create blog entries
+    - delete blog entries
+    - publish blog entries
+    - edit other authors blog entries
+    - publish other authors blog entries
+    - delete other authors blog entries
+    - configure taxonomies
+    - view categories terms
+    - edit categories terms
+    - create categories terms
+    - delete categories terms
+    - view tags terms
+    - edit tags terms
+    - create tags terms
+    - delete tags terms
+    - configure navs
+    - configure globals
+    - configure asset containers
+    - configure forms
+    - view contact form submissions
