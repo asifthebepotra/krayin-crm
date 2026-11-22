@@ -12,6 +12,14 @@
             {{ hero_text }}
         </p>
     {{ /if }}
+
+    {{ if hero_image }}
+        <div style="margin-top: 34px; overflow: hidden; border-radius: 14px;">
+            {{ hero_image }}
+                <img src="{{ url }}" alt="{{ alt ?? title }}" style="display: block; width: 100%; height: auto;">
+            {{ /hero_image }}
+        </div>
+    {{ /if }}
 </section>
 
 <section class="content" style="max-width: 820px; margin: 0 auto; color: #35434c;">
