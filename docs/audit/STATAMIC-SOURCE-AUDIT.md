@@ -284,3 +284,20 @@ Statamic's v6.42.0 package manifest declares a proprietary license. Confirm the 
 ## 14. Runtime status
 
 The source inspection supports a shared-guard prototype and a custom view-resolution prototype, but it does not establish that either works in the integrated app. Composer resolution, Control Panel boot, database migrations, shared login, permissions, inactive-user revocation and public rendering remain mandatory runtime gates.
+
+## 15. API routing boundary
+
+The pinned Statamic `config/api.php` defaults to:
+
+- `enabled = false`
+- route prefix `api`
+- API middleware group `api`
+- content resources disabled by default.
+
+Krayin already has Laravel API routing under the application API prefix (the inspected root `routes/api.php` contains the Laravel user route, and packages may add their own API routes).
+
+For the initial product, keep the Statamic Content API disabled because the native Control Panel and server-rendered public site are the selected CMS interface. If the Content API is enabled later, explicitly choose a route prefix/middleware and verify it does not collide with Krayin's API routes. Do not expose public Statamic user resources or CRM data through the Content API without deliberate authorization and data-exposure review.
+
+Relevant sources:
+- [Statamic API configuration](https://github.com/statamic/cms/blob/v6.42.0/config/api.php)
+- [Statamic API routes](https://github.com/statamic/cms/blob/v6.42.0/routes/api.php)
