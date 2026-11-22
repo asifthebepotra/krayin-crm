@@ -1,0 +1,19 @@
+title: Website Media
+fields:
+  -
+    handle: alt
+    field:
+      type: text
+      display: Alt Text
+      instructions: Describe the image for accessibility and search engines.
+  -
+    handle: caption
+    field:
+      type: textarea
+      display: Caption
+      rows: 2
+  -
+    handle: credit
+    field:
+      type: text
+      display: Credit
