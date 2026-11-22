@@ -13,6 +13,7 @@ return [
             'admin.cms.themes.store',
             'admin.cms.themes.preview',
             'admin.cms.themes.activate',
+            'admin.cms.themes.deactivate',
             'admin.cms.themes.destroy',
         ],
         'sort'  => 8,
