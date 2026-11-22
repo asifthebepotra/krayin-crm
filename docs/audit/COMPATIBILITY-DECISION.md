@@ -94,3 +94,9 @@ Source inspection found that Krayin's `GET /` route redirects to the admin login
 The intended production result is that the domain root serves the Statamic homepage and Krayin login remains below the configurable admin path. This is now a mandatory acceptance test.
 
 This finding does not change the status: **PENDING — no runtime GO decision yet.**
+
+
+
+## Additional route/API scope decision
+
+The Statamic Content API is disabled by default and is not required for the native-Control-Panel plus server-rendered-website MVP. Keep it disabled during SA-01. If enabled in a later phase, verify its default `api` prefix does not collide with Krayin's existing API route group and review every exposed resource.
