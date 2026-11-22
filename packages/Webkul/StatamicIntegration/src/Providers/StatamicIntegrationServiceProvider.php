@@ -16,6 +16,7 @@ use Webkul\StatamicIntegration\Http\Middleware\EnsureKrayinCmsUserIsActive;
 use Webkul\StatamicIntegration\Listeners\QueueStatamicFormSubmission;
 use Webkul\StatamicIntegration\Models\CmsUser;
 use Webkul\StatamicIntegration\Tags\CmsThemeTags;
+use Webkul\StatamicIntegration\Tags\CmsWebsiteTags;
 
 class StatamicIntegrationServiceProvider extends ServiceProvider
 {
