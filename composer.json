@@ -28,7 +28,9 @@
         "prettus/l5-repository": "^3.0",
         "pusher/pusher-php-server": "^7.3",
         "smalot/pdfparser": "^2.11",
-        "webklex/laravel-imap": "^6.0"
+        "webklex/laravel-imap": "^6.0",
+        "inertiajs/inertia-laravel": "^2.0.7",
+        "statamic/cms": "6.42.0"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.14",
@@ -86,7 +88,8 @@
             "Webkul\\User\\": "packages/Webkul/User/src",
             "Webkul\\Warehouse\\": "packages/Webkul/Warehouse/src",
             "Webkul\\WebForm\\": "packages/Webkul/WebForm/src",
-            "Webkul\\Automation\\": "packages/Webkul/Automation/src"
+            "Webkul\\Automation\\": "packages/Webkul/Automation/src",
+            "Webkul\\StatamicIntegration\\": "packages/Webkul/StatamicIntegration/src"
         }
     },
     "autoload-dev": {
@@ -108,13 +111,17 @@
     "scripts": {
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
-            "@php artisan package:discover --ansi"
+            "@php artisan package:discover --ansi",
+            "@php artisan statamic:install --ansi"
         ],
         "post-root-package-install": [
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
         ],
         "post-create-project-cmd": [
             "@php artisan key:generate --ansi"
+        ],
+        "pre-update-cmd": [
+            "Statamic\\Console\\Composer\\Scripts::preUpdateCmd"
         ]
     }
 }
