@@ -63,3 +63,26 @@ This still requires a runtime prototype. The major blockers to verify are:
 - Theme ZIP installation and active website theme resolution are custom features; Statamic's deprecated Theme tag is only an asset helper, not a full website theme manager.
 
 These are design candidates and implementation constraints, not a GO decision. Composer/runtime gates remain pending.
+
+
+## Expanded source-audit findings (2026-11-22)
+
+A deeper source inspection supports a more specific shared-login prototype:
+
+- Statamic v6.42's Eloquent user repository resolves its Eloquent model from the selected Statamic CP guard's Laravel provider and can wrap generic Eloquent models.
+- Krayin's `user` guard and `Webkul\\User\\Models\\User` are therefore a plausible shared identity path.
+- Statamic's CP authorization is independent of Krayin's Bouncer. CMS role permissions must remain separate from CRM permissions.
+- Krayin's `users.status` enforcement must be added to the authenticated Statamic CP path; the Krayin Bouncer middleware is not automatically applied there.
+- Statamic Eloquent user functions expect `preferences` and `last_login`; the inspected Krayin user schema lacks them. Add reviewed integration migrations/model casts or disable the relevant features.
+- Statamic native user creation must be blocked/restricted because it writes to the configured Eloquent users model and could bypass Krayin's required `role_id` and account lifecycle.
+- Krayin already has WebForm intake; a Statamic form adapter should call a domain/service-level lead intake flow, not the request-mutating WebForm controller.
+- Statamic public rendering goes through Laravel's view finder and Antlers engine. ZIP themes require a custom, request-safe template resolver and controlled asset path; the old Statamic Theme tag is not a full theme manager.
+
+## New feasibility documents
+
+- `AUTHENTICATION-AND-ACL-FEASIBILITY.md`
+- `TEMPLATE-AND-THEME-FEASIBILITY.md`
+
+## Decision remains PENDING
+
+These findings strengthen the architecture proposal but do not change the compatibility decision to GO. No Composer solver run, PHP application boot, CP login, permission test, database migration test, public rendering test or Krayin post-install regression test has yet been executed.
