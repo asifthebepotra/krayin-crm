@@ -132,3 +132,19 @@ The controller mutates the global HTTP request and is not a reusable domain serv
 - `WebFormController::formStore()`: compare the new service adapter against existing public form validation and deduplication rules.
 
 **Conclusion:** Krayin offers clear source-level extension points for shared identity and lead creation. The combination remains subject to the runtime compatibility gates in `COMPATIBILITY-PLAN.md`.
+
+## 7. Public homepage route collision
+
+A further source check found a specific root-route collision risk:
+
+- Krayin's `packages/Webkul/Admin/src/Routes/Front/web.php` explicitly registers `GET /` as `krayin.home`.
+- That route calls `Webkul\\Admin\\Http\\Controllers\\Controller::redirectToLogin()`, which redirects to the configured Krayin admin login route.
+- Statamic v6.42.0's `routes/web.php` registers its public frontend as `Route::any('/{segments?}', FrontendController::index)` when Statamic routes are enabled.
+
+This means the combined app must not assume Statamic's optional catch-all will own the root URL. Laravel route registration/matching order and route cache must be tested. The intended product behaviour is:
+
+- `/` serves the public Statamic homepage.
+- Krayin CRM login remains under `/{APP_ADMIN_PATH}/login` (default `/admin/login`).
+- Other explicit Krayin and Statamic routes continue working.
+
+A likely integration solution is to deliberately replace/override the Krayin `/` redirect route with Statamic's frontend controller after both route providers have loaded, or otherwise suppress the Krayin root route. Do not choose a solution until `route:list`, direct HTTP requests and `route:cache` tests confirm the final route.
