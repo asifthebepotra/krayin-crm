@@ -30,7 +30,7 @@ corporate-starter.zip
         └── logo.svg
 ```
 
-Only Antlers templates and approved static assets are accepted. Theme packages cannot contain PHP, Blade views, Composer files, service providers, route definitions, shell scripts, or installation scripts.
+Only Antlers templates and approved static assets are accepted. Theme packages cannot contain PHP, Blade views, Composer files, service providers, route definitions, shell scripts, or installation scripts. JavaScript files are allowed only inside `assets/`; they execute in the public website and are therefore trusted theme code. Only trusted CMS administrators should install ZIP themes.
 
 ## 2. Manifest
 
