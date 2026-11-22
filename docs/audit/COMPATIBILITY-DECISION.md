@@ -86,3 +86,11 @@ A deeper source inspection supports a more specific shared-login prototype:
 ## Decision remains PENDING
 
 These findings strengthen the architecture proposal but do not change the compatibility decision to GO. No Composer solver run, PHP application boot, CP login, permission test, database migration test, public rendering test or Krayin post-install regression test has yet been executed.
+
+## Additional mandatory blocker: root homepage route
+
+Source inspection found that Krayin's `GET /` route redirects to the admin login, while Statamic's public frontend is registered as an optional catch-all. Runtime route ordering and a deliberate Statamic root-route override have not yet been tested.
+
+The intended production result is that the domain root serves the Statamic homepage and Krayin login remains below the configurable admin path. This is now a mandatory acceptance test.
+
+This finding does not change the status: **PENDING — no runtime GO decision yet.**
