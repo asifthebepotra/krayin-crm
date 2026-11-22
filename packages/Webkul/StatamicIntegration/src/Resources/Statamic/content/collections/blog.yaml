@@ -1,0 +1,13 @@
+title: Blog
+date: true
+date_behavior:
+  past: public
+  future: private
+route: '/blog/{slug}'
+sort_dir: desc
+template: blog/show
+blueprints:
+  - post
+taxonomies:
+  - categories
+  - tags
