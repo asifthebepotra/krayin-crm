@@ -30,15 +30,19 @@ class CmsThemeManager
             throw new RuntimeException('The selected theme does not contain an installed views directory.');
         }
 
-        DB::table('cms_website_settings')->updateOrInsert(
-            ['id' => 1],
-            [
-                'active_theme_slug' => $theme->slug,
-                'active_theme_version' => $theme->version,
-                'updated_at' => now(),
-                'created_at' => DB::raw('COALESCE(created_at, NOW())'),
-            ]
-        );
+        $settingsExists = DB::table('cms_website_settings')->where('id', 1)->exists();
+
+        $values = [
+            'active_theme_slug' => $theme->slug,
+            'active_theme_version' => $theme->version,
+            'updated_at' => now(),
+        ];
+
+        if (! $settingsExists) {
+            $values['created_at'] = now();
+        }
+
+        DB::table('cms_website_settings')->updateOrInsert(['id' => 1], $values);
     }
 
     public function uninstall(CmsThemeInstallation $theme): void
