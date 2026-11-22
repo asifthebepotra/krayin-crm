@@ -112,6 +112,7 @@ class StatamicIntegrationServiceProvider extends ServiceProvider
         config()->set('statamic.users.wizard_invitation', false);
 
         CmsThemeTags::register();
+        CmsWebsiteTags::register();
 
         $router = $this->app->make(Router::class);
 
