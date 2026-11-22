@@ -15,6 +15,7 @@ use Webkul\StatamicIntegration\Http\Middleware\ApplyActiveStatamicTheme;
 use Webkul\StatamicIntegration\Http\Middleware\EnsureKrayinCmsUserIsActive;
 use Webkul\StatamicIntegration\Listeners\QueueStatamicFormSubmission;
 use Webkul\StatamicIntegration\Models\CmsUser;
+use Webkul\StatamicIntegration\Tags\CmsThemeTags;
 
 class StatamicIntegrationServiceProvider extends ServiceProvider
 {
@@ -109,6 +110,8 @@ class StatamicIntegrationServiceProvider extends ServiceProvider
          */
         config()->set('statamic.users.two_factor_enabled', false);
         config()->set('statamic.users.wizard_invitation', false);
+
+        CmsThemeTags::register();
 
         $router = $this->app->make(Router::class);
 
