@@ -40,7 +40,14 @@
                     </div>
                 {{ /fields }}
 
-                <input type="text" class="hidden" name="{{ honeypot ?? 'honeypot' }}" tabindex="-1" autocomplete="off">
+                <input
+                    type="text"
+                    name="{{ honeypot ?? 'honeypot' }}"
+                    tabindex="-1"
+                    autocomplete="off"
+                    aria-hidden="true"
+                    style="position: absolute; left: -10000px; width: 1px; height: 1px; opacity: 0;"
+                >
 
                 <button type="submit" style="display: inline-flex; justify-content: center; align-items: center; min-height: 46px; padding: 0 20px; border: 0; border-radius: 7px; background: #075a47; color: #fff; font-size: 14px; font-weight: 650; cursor: pointer;">
                     Send enquiry
