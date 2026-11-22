@@ -109,3 +109,12 @@ The Statamic Content API is disabled by default and is not required for the nati
 The local `php artisan config:clear` attempt failed because `vendor/autoload.php` was absent in the fresh checkout. No runtime compatibility result is implied.
 
 The Composer validate warnings about the exact Statamic version and stale lockfile are expected for this pinned audit plus `--no-update` stage. Actual installation, Laravel boot, route tests, auth/ACL tests, rendering and regression tests remain pending. The overall decision remains **PENDING**, not GO.
+
+
+## Local Composer dry-run result and next action (2026-11-22)
+
+The local dry run completed without a dependency resolution error. It proposed 35 installs, 12 updates and zero removals. Selected versions were Statamic v6.42.0, Inertia Laravel v2.0.28 and Laravel v12.73.0 (from v12.71.0). Guzzle moves from 7.16.1 to 7.16.5; Symfony HttpFoundation stays at v7.4.23.
+
+The local checkout has no `vendor/autoload.php`, explaining why `php artisan config:clear` cannot yet execute. Composer 2.5+ errors if `composer install` is run while `composer.json` requires packages missing from `composer.lock`; therefore the next operation after approving the dry-run is the first actual targeted update with `--no-scripts`, as specified in the compatibility plan. After that, run package discovery and `statamic:install` manually, then add Statamic's Composer hooks for future operations.
+
+**Dependency solver: PASS (dry run). Runtime compatibility: NOT TESTED. Overall SA-01 decision: PENDING.**
