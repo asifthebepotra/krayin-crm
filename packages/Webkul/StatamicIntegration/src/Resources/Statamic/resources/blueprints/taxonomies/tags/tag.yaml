@@ -1,0 +1,11 @@
+title: Tag
+sections:
+  main:
+    display: Tag
+    fields:
+      -
+        handle: description
+        field:
+          type: textarea
+          display: Description
+          rows: 2
