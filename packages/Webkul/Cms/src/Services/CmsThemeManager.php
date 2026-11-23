@@ -296,6 +296,10 @@ class CmsThemeManager
 
     public function activate(string $slug, string $version): CmsTheme
     {
+        if (! Schema::hasTable('cms_themes') || ! Schema::hasTable('cms_settings')) {
+            throw new RuntimeException('Run the CMS database migrations before activating a theme.');
+        }
+
         $theme = CmsTheme::query()
             ->where('slug', $slug)
             ->where('version', $version)
@@ -304,11 +308,17 @@ class CmsThemeManager
         $viewsRoot = realpath(resource_path('views/cms-themes'));
         $viewsPath = realpath($theme->view_path);
 
+        $assetsRoot = realpath(public_path('themes'));
+        $assetsPath = realpath($theme->asset_path);
+
         if (
             ! $viewsRoot
             || ! $viewsPath
             || ! str_starts_with($viewsPath, $viewsRoot.DIRECTORY_SEPARATOR)
             || ! File::isDirectory($viewsPath)
+            || ! $assetsRoot
+            || ! $assetsPath
+            || ! str_starts_with($assetsPath, $assetsRoot.DIRECTORY_SEPARATOR)
         ) {
             throw new RuntimeException('The installed theme view directory is missing or invalid.');
         }
@@ -334,6 +344,10 @@ class CmsThemeManager
 
     public function remove(string $slug, string $version): void
     {
+        if (! Schema::hasTable('cms_themes') || ! Schema::hasTable('cms_settings')) {
+            throw new RuntimeException('Run the CMS database migrations before removing a theme.');
+        }
+
         $theme = CmsTheme::query()
             ->where('slug', $slug)
             ->where('version', $version)
@@ -404,6 +418,10 @@ class CmsThemeManager
             }
         }
 
+        if (mb_strlen($manifest['name']) > 150) {
+            throw new RuntimeException('Theme name must not exceed 150 characters.');
+        }
+
         if (! preg_match('/^[a-z0-9][a-z0-9-]{0,78}$/', $manifest['slug'])) {
             throw new RuntimeException('Theme slug must contain lowercase letters, numbers and hyphens only.');
         }
@@ -418,12 +436,12 @@ class CmsThemeManager
             throw new RuntimeException('This theme requires a newer Statamic version.');
         }
 
-        if (isset($manifest['author']) && ! is_string($manifest['author'])) {
-            throw new RuntimeException('Theme author must be a string.');
+        if (isset($manifest['author']) && (! is_string($manifest['author']) || mb_strlen($manifest['author']) > 150)) {
+            throw new RuntimeException('Theme author must be a string with at most 150 characters.');
         }
 
-        if (isset($manifest['description']) && ! is_string($manifest['description'])) {
-            throw new RuntimeException('Theme description must be a string.');
+        if (isset($manifest['description']) && (! is_string($manifest['description']) || mb_strlen($manifest['description']) > 5000)) {
+            throw new RuntimeException('Theme description must be a string with at most 5000 characters.');
         }
     }
 
