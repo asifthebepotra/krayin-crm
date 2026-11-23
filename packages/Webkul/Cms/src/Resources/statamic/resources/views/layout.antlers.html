@@ -37,7 +37,7 @@
 <body>
     <header class="site-header">
         <div class="site-header__inner">
-            <a class="site-brand" href="/">{{ site_name ?? 'Your Website' }}</a>
+            <a class="site-brand" href="/">{{ site:site_name ?? 'Your Website' }}</a>
             <nav class="site-nav" aria-label="Main navigation">
                 {{ nav:main }}
                     <a href="{{ url }}">{{ title }}</a>
@@ -52,7 +52,7 @@
 
     <footer class="site-footer">
         <div class="site-footer__inner">
-            {{ site_name ?? 'Your Website' }} · All rights reserved
+            {{ site:site_name ?? 'Your Website' }} · All rights reserved
         </div>
     </footer>
 </body>
