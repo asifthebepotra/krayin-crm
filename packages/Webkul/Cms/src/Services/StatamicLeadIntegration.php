@@ -3,11 +3,13 @@
 namespace Webkul\Cms\Services;
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 use Statamic\Contracts\Forms\Submission;
 use Throwable;
 use Webkul\Cms\Models\CmsUser;
+use Webkul\Contact\Repositories\PersonRepository;
 use Webkul\Lead\Repositories\LeadRepository;
 use Webkul\Lead\Repositories\PipelineRepository;
 use Webkul\Lead\Repositories\SourceRepository;
@@ -21,6 +23,7 @@ class StatamicLeadIntegration
         protected PipelineRepository $pipelineRepository,
         protected SourceRepository $sourceRepository,
         protected TypeRepository $typeRepository,
+        protected PersonRepository $personRepository,
     ) {}
 
     /**
@@ -112,6 +115,8 @@ class StatamicLeadIntegration
 
                 $person = $this->findPersonByEmail($payload['email']);
 
+                Event::dispatch('lead.create.before');
+
                 $personData = $person
                     ? ['id' => $person->id]
                     : [
@@ -145,6 +150,8 @@ class StatamicLeadIntegration
                     'lead_source_id' => $source->id,
                     'lead_type_id' => $type->id,
                 ]);
+
+                Event::dispatch('lead.create.after', $lead);
 
                 DB::table('cms_submission_logs')
                     ->where('id', $log->id)
@@ -219,7 +226,7 @@ class StatamicLeadIntegration
     {
         $needle = mb_strtolower($email);
 
-        return app(\Webkul\Contact\Repositories\PersonRepository::class)
+        return $this->personRepository
             ->getModel()
             ->whereRaw(
                 'LOWER(CAST(emails AS CHAR)) LIKE ?',
