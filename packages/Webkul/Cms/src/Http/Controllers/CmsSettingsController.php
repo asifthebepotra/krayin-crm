@@ -6,6 +6,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\View\View;
+use Webkul\Cms\Models\CmsUser;
 use Webkul\Cms\Services\CmsSettingsManager;
 
 class CmsSettingsController extends Controller
@@ -18,6 +19,10 @@ class CmsSettingsController extends Controller
     {
         return view('cms::settings', [
             'settings' => $this->settingsManager->current(),
+            'employees' => CmsUser::query()
+                ->where('status', 1)
+                ->orderBy('name')
+                ->get(['id', 'name', 'email']),
         ]);
     }
 
@@ -33,10 +38,26 @@ class CmsSettingsController extends Controller
             ],
             'default_locale' => ['required', 'string', 'max:12'],
             'timezone' => ['required', 'timezone'],
+            'default_lead_owner_id' => ['nullable', 'integer', 'exists:users,id'],
         ]);
 
         if (! empty($validated['primary_domain'])) {
             $validated['primary_domain'] = strtolower($validated['primary_domain']);
+        }
+
+        if (! empty($validated['default_lead_owner_id'])) {
+            $activeOwner = CmsUser::query()
+                ->whereKey($validated['default_lead_owner_id'])
+                ->where('status', 1)
+                ->exists();
+
+            if (! $activeOwner) {
+                return back()
+                    ->withInput()
+                    ->withErrors([
+                        'default_lead_owner_id' => trans('cms::app.settings.active_owner_required'),
+                    ]);
+            }
         }
 
         $this->settingsManager->update($validated);
