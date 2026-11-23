@@ -35,6 +35,10 @@ class CmsThemeManager
 
     public function active(): ?CmsTheme
     {
+        if (! Schema::hasTable('cms_settings') || ! Schema::hasTable('cms_themes')) {
+            return null;
+        }
+
         $settings = CmsSetting::query()->first();
 
         if (! $settings?->active_theme_slug || ! $settings?->active_theme_version) {
@@ -140,7 +144,7 @@ class CmsThemeManager
 
                 $contents = $zip->getFromIndex($index);
 
-                if (! is_string($contents)) {
+                if (! is_string($contents) || strlen($contents) !== $size) {
                     throw new RuntimeException("Unable to read archive file: {$name}");
                 }
 
