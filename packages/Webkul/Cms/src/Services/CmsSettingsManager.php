@@ -65,9 +65,11 @@ class CmsSettingsManager
         }
 
         $variables = $set->in(Site::default()->handle());
+        $siteName = $settings->site_name ?: config('app.name');
 
-        $variables->set('site_name', $settings->site_name ?: config('app.name'));
-
-        $variables->save();
+        if ($variables->get('site_name') !== $siteName) {
+            $variables->set('site_name', $siteName);
+            $variables->save();
+        }
     }
 }
