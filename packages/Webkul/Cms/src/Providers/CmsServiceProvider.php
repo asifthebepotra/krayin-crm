@@ -3,10 +3,12 @@
 namespace Webkul\Cms\Providers;
 
 use Illuminate\Routing\Router;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Statamic\Http\Controllers\FrontendController;
 use Webkul\Cms\Http\Middleware\EnsureActiveKrayinUser;
+use Webkul\Cms\Listeners\CreateKrayinLeadFromStatamicForm;
 use Webkul\Cms\Models\CmsUser;
 
 class CmsServiceProvider extends ServiceProvider
@@ -74,6 +76,8 @@ class CmsServiceProvider extends ServiceProvider
          * being overwritten by a later middlewareGroup() call.
          */
         $this->app->booted(function () use ($router) {
+            Event::listen(\Statamic\Events\FormSubmitted::class, CreateKrayinLeadFromStatamicForm::class);
+
             $router->prependMiddlewareToGroup(
                 'statamic.cp.authenticated',
                 EnsureActiveKrayinUser::class
