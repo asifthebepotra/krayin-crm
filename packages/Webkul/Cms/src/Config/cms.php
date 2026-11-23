@@ -36,4 +36,14 @@ return [
         'cms_editor' => 'Content Editor',
         'cms_author' => 'Content Author',
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Forms connected to CRM leads
+    |--------------------------------------------------------------------------
+    */
+
+    'forms_to_crm' => [
+        'contact' => true,
+    ],
 ];
