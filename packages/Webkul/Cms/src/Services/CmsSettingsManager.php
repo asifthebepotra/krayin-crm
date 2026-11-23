@@ -2,6 +2,8 @@
 
 namespace Webkul\Cms\Services;
 
+use Statamic\Facades\GlobalSet;
+use Statamic\Facades\Site;
 use Webkul\Cms\Models\CmsSetting;
 
 class CmsSettingsManager
@@ -11,7 +13,7 @@ class CmsSettingsManager
      */
     public function current(): CmsSetting
     {
-        return CmsSetting::query()->firstOrCreate(
+        $settings = CmsSetting::query()->firstOrCreate(
             ['id' => 1],
             [
                 'site_name'      => config('app.name'),
@@ -19,6 +21,10 @@ class CmsSettingsManager
                 'timezone'       => config('app.timezone', 'UTC'),
             ]
         );
+
+        $this->syncSiteGlobal($settings);
+
+        return $settings;
     }
 
     /**
@@ -32,6 +38,36 @@ class CmsSettingsManager
 
         $settings->save();
 
-        return $settings->refresh();
+        $settings->refresh();
+
+        $this->syncSiteGlobal($settings);
+
+        return $settings;
+    }
+
+    /**
+     * Keep the Statamic "site" global aligned with the Krayin website name.
+     */
+    protected function syncSiteGlobal(CmsSetting $settings): void
+    {
+        if (! class_exists(\Statamic\Statamic::class)) {
+            return;
+        }
+
+        $set = GlobalSet::find('site');
+
+        if (! $set) {
+            $set = GlobalSet::make()
+                ->handle('site')
+                ->title('Site');
+
+            $set->save();
+        }
+
+        $variables = $set->in(Site::default()->handle());
+
+        $variables->set('site_name', $settings->site_name ?: config('app.name'));
+
+        $variables->save();
     }
 }
