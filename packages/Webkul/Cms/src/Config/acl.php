@@ -19,4 +19,10 @@ return [
         'route' => ['admin.cms.users.index', 'admin.cms.users.update'],
         'sort'  => 2,
     ],
+    [
+        'key'   => 'cms.submissions',
+        'name'  => 'cms::app.submissions.menu',
+        'route' => 'admin.cms.submissions.index',
+        'sort'  => 3,
+    ],
 ];
