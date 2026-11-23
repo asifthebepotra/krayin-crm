@@ -5,6 +5,7 @@ namespace Webkul\Cms\Http\Controllers;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\View\View;
 use Webkul\Cms\Models\CmsUser;
 use Webkul\Cms\Services\CmsSettingsManager;
@@ -17,6 +18,12 @@ class CmsSettingsController extends Controller
 
     public function edit(): View
     {
+        abort_unless(
+            Schema::hasTable('cms_settings'),
+            503,
+            trans('cms::app.settings.install_required')
+        );
+
         return view('cms::settings', [
             'settings' => $this->settingsManager->current(),
             'employees' => CmsUser::query()
@@ -28,6 +35,12 @@ class CmsSettingsController extends Controller
 
     public function update(Request $request): RedirectResponse
     {
+        abort_unless(
+            Schema::hasTable('cms_settings'),
+            503,
+            trans('cms::app.settings.install_required')
+        );
+
         $validated = $request->validate([
             'site_name' => ['nullable', 'string', 'max:150'],
             'primary_domain' => [
@@ -62,8 +75,8 @@ class CmsSettingsController extends Controller
 
         $this->settingsManager->update($validated);
 
-        session()->flash('success', trans('cms::app.settings.updated'));
-
-        return redirect()->route('admin.cms.settings.edit');
+        return redirect()
+            ->route('admin.cms.settings.edit')
+            ->with('success', trans('cms::app.settings.updated'));
     }
 }
