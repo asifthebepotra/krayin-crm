@@ -1,0 +1,8 @@
+{
+    "name": "Krayin Starter",
+    "slug": "krayin-starter",
+    "version": "1.0.0",
+    "author": "Krayin",
+    "description": "A clean starter theme for a Krayin and Statamic website.",
+    "minimum_statamic_version": "6.42.0"
+}
