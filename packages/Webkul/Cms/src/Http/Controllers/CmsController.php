@@ -6,6 +6,7 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\View\View;
+use Webkul\Cms\Models\CmsSetting;
 use Webkul\Cms\Services\CmsSettingsManager;
 
 class CmsController extends Controller
@@ -14,9 +15,6 @@ class CmsController extends Controller
         protected CmsSettingsManager $settingsManager
     ) {}
 
-    /**
-     * Show the Krayin entry point for the native Statamic Control Panel.
-     */
     public function index(): View
     {
         $statamicInstalled = class_exists(\Statamic\Statamic::class);
@@ -56,14 +54,14 @@ class CmsController extends Controller
         }
 
         return view('cms::index', [
-            'settings'            => Schema::hasTable('cms_settings')
+            'settings' => Schema::hasTable('cms_settings')
                 ? $this->settingsManager->current()
                 : new CmsSetting(['site_name' => config('app.name')]),
-            'statamicInstalled'   => $statamicInstalled,
+            'statamicInstalled' => $statamicInstalled,
             'controlPanelEnabled' => $controlPanelEnabled,
-            'controlPanelUrl'     => $controlPanelUrl,
-            'statamicVersion'     => $statamicVersion,
-            'submissionSummary'   => $submissionSummary,
+            'controlPanelUrl' => $controlPanelUrl,
+            'statamicVersion' => $statamicVersion,
+            'submissionSummary' => $submissionSummary,
         ]);
     }
 }
