@@ -10,6 +10,10 @@ class CmsController extends Controller
     /**
      * Show the Krayin entry point for the native Statamic Control Panel.
      */
+    public function __construct(
+        protected CmsSettingsManager $settingsManager
+    ) {}
+
     public function index(): View
     {
         $statamicInstalled = class_exists(\Statamic\Statamic::class);
@@ -34,11 +38,12 @@ class CmsController extends Controller
             $statamicVersion = \Composer\InstalledVersions::getPrettyVersion('statamic/cms');
         }
 
-        return view('cms::index', compact(
-            'statamicInstalled',
+        return view('cms::index', [
+            'settings' => $this->settingsManager->current(),
+            'statamicInstalled' => $statamicInstalled,
             'controlPanelEnabled',
             'controlPanelUrl',
-            'statamicVersion'
-        ));
+            'statamicVersion' => $statamicVersion,
+        ]);
     }
 }
