@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="{{ site:short_locale ?? 'en' }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ seo_title ?? title }}</title>
+    {{ if seo_description }}
+        <meta name="description" content="{{ seo_description }}">
+    {{ /if }}
+    {{ if social_image }}
+        {{ social_image }}
+            <meta property="og:image" content="{{ url }}">
+        {{ /social_image }}
+    {{ /if }}
+    <style>
+        :root { color-scheme: light; font-family: Inter, ui-sans-serif, system-ui, sans-serif; color: #17211d; background: #f7f8f6; }
+        * { box-sizing: border-box; }
+        body { margin: 0; }
+        a { color: inherit; }
+        .site-header { background: #fff; border-bottom: 1px solid #e6e9e6; }
+        .site-header__inner, .site-main, .site-footer__inner { width: min(1120px, calc(100% - 40px)); margin: 0 auto; }
+        .site-header__inner { min-height: 72px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+        .site-brand { font-size: 18px; font-weight: 750; text-decoration: none; }
+        .site-nav { display: flex; flex-wrap: wrap; gap: 18px; }
+        .site-nav a { text-decoration: none; color: #52615a; font-size: 14px; }
+        .site-main { min-height: 65vh; padding: 64px 0; }
+        .site-hero { max-width: 760px; margin: 0 auto 42px; text-align: center; }
+        .site-hero h1 { margin: 0 0 14px; font-size: clamp(36px, 6vw, 64px); line-height: 1.06; letter-spacing: -.04em; }
+        .site-hero p { margin: 0; color: #607069; font-size: 18px; line-height: 1.6; }
+        .site-content { max-width: 780px; margin: 0 auto; font-size: 17px; line-height: 1.8; }
+        .site-content img { max-width: 100%; height: auto; }
+        .site-footer { background: #17211d; color: #dce5df; }
+        .site-footer__inner { padding: 28px 0; font-size: 13px; }
+        @media (max-width: 640px) { .site-header__inner { align-items: flex-start; flex-direction: column; padding: 18px 0; } .site-main { padding: 44px 0; } }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <div class="site-header__inner">
+            <a class="site-brand" href="/">{{ site:site_name ?? 'Your Website' }}</a>
+            <nav class="site-nav" aria-label="Main navigation">
+                {{ nav:main }}
+                    <a href="{{ url }}">{{ title }}</a>
+                {{ /nav:main }}
+            </nav>
+        </div>
+    </header>
+
+    <main class="site-main">
+        {{ template_content }}
+    </main>
+
+    <footer class="site-footer">
+        <div class="site-footer__inner">
+            {{ site:site_name ?? 'Your Website' }} · All rights reserved
+        </div>
+    </footer>
+</body>
+</html>

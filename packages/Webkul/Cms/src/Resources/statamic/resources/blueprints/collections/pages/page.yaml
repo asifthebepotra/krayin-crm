@@ -1,0 +1,52 @@
+title: Page
+tabs:
+  main:
+    display: Content
+    sections:
+      -
+        display: Hero
+        fields:
+          -
+            handle: hero_heading
+            field:
+              type: text
+              display: Hero heading
+          -
+            handle: hero_subtitle
+            field:
+              type: textarea
+              display: Hero subtitle
+      -
+        display: Page Content
+        fields:
+          -
+            handle: content
+            field:
+              type: markdown
+              display: Content
+              localizable: true
+  seo:
+    display: SEO
+    sections:
+      -
+        display: Search and Social
+        fields:
+          -
+            handle: seo_title
+            field:
+              type: text
+              display: SEO title
+              instructions: Leave blank to use the page title.
+          -
+            handle: seo_description
+            field:
+              type: textarea
+              display: Meta description
+              character_limit: 160
+          -
+            handle: social_image
+            field:
+              type: assets
+              display: Social sharing image
+              container: assets
+              max_files: 1

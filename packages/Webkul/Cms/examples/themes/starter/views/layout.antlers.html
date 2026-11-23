@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="{{ site:short_locale ?? 'en' }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ seo_title ?? title }}</title>
+    {{ if seo_description }}
+        <meta name="description" content="{{ seo_description }}">
+    {{ /if }}
+    {{ if social_image }}
+        {{ social_image }}
+            <meta property="og:image" content="{{ url }}">
+        {{ /social_image }}
+    {{ /if }}
+    <link rel="stylesheet" href="{{ cms_theme:asset path='assets/css/app.css' }}">
+</head>
+<body>
+    <header class="site-header">
+        <a class="site-brand" href="/">{{ site:site_name ?? 'Your Website' }}</a>
+        <nav aria-label="Main navigation">
+            {{ nav:main }}
+                <a href="{{ url }}">{{ title }}</a>
+            {{ /nav:main }}
+        </nav>
+    </header>
+
+    <main class="site-main">
+        {{ template_content }}
+    </main>
+
+    <footer class="site-footer">
+        {{ site:site_name ?? 'Your Website' }} · All rights reserved
+    </footer>
+</body>
+</html>

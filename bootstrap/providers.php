@@ -9,6 +9,7 @@ use Webkul\Admin\Providers\AdminServiceProvider;
 use Webkul\Attribute\Providers\AttributeServiceProvider;
 use Webkul\Automation\Providers\WorkflowServiceProvider;
 use Webkul\Contact\Providers\ContactServiceProvider;
+use Webkul\Cms\Providers\CmsServiceProvider;
 use Webkul\Core\Providers\CoreServiceProvider;
 use Webkul\DataGrid\Providers\DataGridServiceProvider;
 use Webkul\DataTransfer\Providers\DataTransferServiceProvider;
@@ -46,6 +47,7 @@ return [
     AttributeServiceProvider::class,
     WorkflowServiceProvider::class,
     ContactServiceProvider::class,
+    CmsServiceProvider::class,
     CoreServiceProvider::class,
     DataGridServiceProvider::class,
     DataTransferServiceProvider::class,

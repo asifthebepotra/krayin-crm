@@ -1,0 +1,58 @@
+title: Contact Form
+tabs:
+  main:
+    display: Contact details
+    sections:
+      -
+        display: Your enquiry
+        fields:
+          -
+            handle: name
+            field:
+              type: text
+              display: Full name
+              validate:
+                - required
+                - max:150
+          -
+            handle: email
+            field:
+              type: text
+              input_type: email
+              display: Email address
+              validate:
+                - required
+                - email
+                - max:190
+          -
+            handle: phone
+            field:
+              type: text
+              display: Phone number
+              validate:
+                - nullable
+                - max:50
+          -
+            handle: company
+            field:
+              type: text
+              display: Company
+              validate:
+                - nullable
+                - max:190
+          -
+            handle: subject
+            field:
+              type: text
+              display: Subject
+              validate:
+                - nullable
+                - max:190
+          -
+            handle: message
+            field:
+              type: textarea
+              display: Message
+              validate:
+                - required
+                - max:10000

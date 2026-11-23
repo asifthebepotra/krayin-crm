@@ -1,0 +1,56 @@
+title: Blog Post
+tabs:
+  main:
+    display: Content
+    sections:
+      -
+        display: Article
+        fields:
+          -
+            handle: excerpt
+            field:
+              type: textarea
+              display: Excerpt
+              character_limit: 300
+          -
+            handle: featured_image
+            field:
+              type: assets
+              display: Featured image
+              container: assets
+              max_files: 1
+          -
+            handle: author_name
+            field:
+              type: text
+              display: Author name
+          -
+            handle: content
+            field:
+              type: markdown
+              display: Article content
+              localizable: true
+  seo:
+    display: SEO
+    sections:
+      -
+        display: Search and Social
+        fields:
+          -
+            handle: seo_title
+            field:
+              type: text
+              display: SEO title
+          -
+            handle: seo_description
+            field:
+              type: textarea
+              display: Meta description
+              character_limit: 160
+          -
+            handle: social_image
+            field:
+              type: assets
+              display: Social sharing image
+              container: assets
+              max_files: 1

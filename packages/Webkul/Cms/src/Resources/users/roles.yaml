@@ -1,0 +1,59 @@
+cms_admin:
+  title: CMS Administrator
+  permissions:
+    - access cp
+    - configure collections
+    - view pages entries
+    - edit pages entries
+    - create pages entries
+    - publish pages entries
+    - delete pages entries
+    - view blog entries
+    - edit blog entries
+    - create blog entries
+    - publish blog entries
+    - delete blog entries
+    - configure navs
+    - view main nav
+    - edit main nav
+    - configure globals
+    - configure taxonomies
+    - configure asset containers
+    - view assets assets
+    - upload assets assets
+    - edit assets assets
+    - edit assets folders
+    - configure forms
+    - view contact form submissions
+    - configure fields
+    - configure form fields
+
+cms_editor:
+  title: Content Editor
+  permissions:
+    - access cp
+    - view pages entries
+    - edit pages entries
+    - create pages entries
+    - publish pages entries
+    - view blog entries
+    - edit blog entries
+    - create blog entries
+    - publish blog entries
+    - view assets assets
+    - upload assets assets
+    - edit assets assets
+    - edit assets folders
+    - view main nav
+    - edit main nav
+
+cms_author:
+  title: Content Author
+  permissions:
+    - access cp
+    - view pages entries
+    - edit pages entries
+    - create pages entries
+    - view blog entries
+    - edit blog entries
+    - create blog entries

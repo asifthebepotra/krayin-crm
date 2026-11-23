@@ -1,0 +1,20 @@
+<section class="site-hero">
+    <h1>{{ hero_heading ?? title }}</h1>
+    {{ if hero_subtitle }}
+        <p>{{ hero_subtitle }}</p>
+    {{ /if }}
+</section>
+
+<section class="site-content">
+    {{ collection:blog sort="date:desc" }}
+        <article style="padding: 24px 0; border-bottom: 1px solid #e6e9e6;">
+            <h2 style="margin: 0 0 8px;"><a href="{{ url }}">{{ title }}</a></h2>
+            {{ if excerpt }}
+                <p>{{ excerpt }}</p>
+            {{ /if }}
+            <p style="color: #718078; font-size: 13px;">{{ date format="F j, Y" }}</p>
+        </article>
+    {{ else }}
+        <p>No articles have been published yet.</p>
+    {{ /collection:blog }}
+</section>

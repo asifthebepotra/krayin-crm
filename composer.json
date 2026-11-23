@@ -14,6 +14,7 @@
         "enshrined/svg-sanitize": "^1.0.0",
         "google/apiclient": "^2.18",
         "guzzlehttp/guzzle": "^7.8",
+        "inertiajs/inertia-laravel": "^2.0.7",
         "khaled.alshamaa/ar-php": "^7.0",
         "konekt/concord": "^1.17",
         "laravel/framework": "^12.0",
@@ -28,6 +29,7 @@
         "prettus/l5-repository": "^3.0",
         "pusher/pusher-php-server": "^7.3",
         "smalot/pdfparser": "^2.11",
+        "statamic/cms": "6.42.0",
         "webklex/laravel-imap": "^6.0"
     },
     "require-dev": {
@@ -70,23 +72,24 @@
             "Webkul\\Activity\\": "packages/Webkul/Activity/src",
             "Webkul\\Admin\\": "packages/Webkul/Admin/src",
             "Webkul\\Attribute\\": "packages/Webkul/Attribute/src",
+            "Webkul\\Automation\\": "packages/Webkul/Automation/src",
+            "Webkul\\Cms\\": "packages/Webkul/Cms/src",
             "Webkul\\Contact\\": "packages/Webkul/Contact/src",
             "Webkul\\Core\\": "packages/Webkul/Core/src",
             "Webkul\\DataGrid\\": "packages/Webkul/DataGrid/src",
             "Webkul\\DataTransfer\\": "packages/Webkul/DataTransfer/src",
-            "Webkul\\Email\\": "packages/Webkul/Email/src",
             "Webkul\\EmailTemplate\\": "packages/Webkul/EmailTemplate/src",
+            "Webkul\\Email\\": "packages/Webkul/Email/src",
             "Webkul\\GoogleContact\\": "packages/Webkul/GoogleContact/src",
-            "Webkul\\Marketing\\": "packages/Webkul/Marketing/src",
             "Webkul\\Installer\\": "packages/Webkul/Installer/src",
             "Webkul\\Lead\\": "packages/Webkul/Lead/src",
+            "Webkul\\Marketing\\": "packages/Webkul/Marketing/src",
             "Webkul\\Product\\": "packages/Webkul/Product/src",
             "Webkul\\Quote\\": "packages/Webkul/Quote/src",
             "Webkul\\Tag\\": "packages/Webkul/Tag/src",
             "Webkul\\User\\": "packages/Webkul/User/src",
             "Webkul\\Warehouse\\": "packages/Webkul/Warehouse/src",
-            "Webkul\\WebForm\\": "packages/Webkul/WebForm/src",
-            "Webkul\\Automation\\": "packages/Webkul/Automation/src"
+            "Webkul\\WebForm\\": "packages/Webkul/WebForm/src"
         }
     },
     "autoload-dev": {
@@ -108,13 +111,17 @@
     "scripts": {
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
-            "@php artisan package:discover --ansi"
+            "@php artisan package:discover --ansi",
+            "@php artisan statamic:install --ansi"
         ],
         "post-root-package-install": [
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
         ],
         "post-create-project-cmd": [
             "@php artisan key:generate --ansi"
+        ],
+        "pre-update-cmd": [
+            "Statamic\\Console\\Composer\\Scripts::preUpdateCmd"
         ]
     }
 }
