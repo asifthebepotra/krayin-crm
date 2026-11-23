@@ -134,6 +134,7 @@ class CmsThemeManager
             }
 
             $records = [];
+            $seenPaths = [];
             $totalBytes = 0;
             $hasLayout = false;
             $hasDefaultTemplate = false;
@@ -185,7 +186,10 @@ class CmsThemeManager
                     }
                 }
 
-                $records[$name] = $contents;
+                $records[] = [
+                    'name' => $name,
+                    'contents' => $contents,
+                ];
             }
 
             if (! $hasLayout || ! $hasDefaultTemplate) {
