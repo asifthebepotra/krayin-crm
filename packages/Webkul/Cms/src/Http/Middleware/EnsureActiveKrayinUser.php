@@ -11,6 +11,12 @@ class EnsureActiveKrayinUser
 {
     public function handle(Request $request, Closure $next): Response
     {
+        /*
+         * Statamic's CP guard is configured to use Krayin's existing session
+         * guard. Select it explicitly before resolving the shared identity.
+         */
+        Auth::shouldUse('user');
+
         $guard = Auth::guard('user');
         $user = $guard->user();
 
