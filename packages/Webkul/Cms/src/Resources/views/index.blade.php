@@ -20,6 +20,10 @@
                     @lang('cms::app.general.manage_settings')
                 </a>
 
+                <a href="{{ route('admin.cms.themes.index') }}" class="secondary-button">
+                    @lang('cms::app.general.manage_themes')
+                </a>
+
                 @if ($controlPanelEnabled)
                     <a href="{{ $controlPanelUrl }}" class="primary-button">
                         @lang('cms::app.general.open_control_panel')
