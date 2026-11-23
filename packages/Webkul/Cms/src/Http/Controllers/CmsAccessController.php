@@ -42,13 +42,13 @@ class CmsAccessController extends Controller
 
         $user = CmsUser::query()->findOrFail($userId);
 
-        if (! (bool) $user->status) {
-            abort(422, trans('cms::app.users.inactive_user'));
-        }
-
         $validated = $request->validate([
             'role' => ['nullable', 'string', 'in:'.implode(',', array_keys(config('cms.roles', [])))],
         ]);
+
+        if (! (bool) $user->status && ! empty($validated['role'])) {
+            abort(422, trans('cms::app.users.inactive_user'));
+        }
 
         DB::transaction(function () use ($user, $validated) {
             DB::table('statamic_role_user')
