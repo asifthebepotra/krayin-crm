@@ -40,7 +40,7 @@ class InstallCmsCommand extends Command
      */
     protected function installDefaultFiles(): void
     {
-        $packageRoot = dirname(__DIR__, 3).'/Resources/statamic';
+        $packageRoot = dirname(__DIR__, 2).'/Resources/statamic';
 
         $files = [
             'content/collections/pages.yaml' => base_path('content/collections/pages.yaml'),
