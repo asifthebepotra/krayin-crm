@@ -6,6 +6,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\View\View;
 use Statamic\Auth\PermissionCache;
 use Statamic\Facades\Blink;
@@ -15,6 +16,9 @@ class CmsAccessController extends Controller
 {
     public function index(): View
     {
+        abort_unless(class_exists(\Statamic\Statamic::class), 503, trans('cms::app.users.statamic_required'));
+        abort_unless(Schema::hasTable('statamic_role_user'), 503, trans('cms::app.users.install_required'));
+
         $users = CmsUser::query()
             ->select(['id', 'name', 'email', 'status'])
             ->orderBy('name')
@@ -33,6 +37,9 @@ class CmsAccessController extends Controller
 
     public function update(Request $request, int $userId): RedirectResponse
     {
+        abort_unless(class_exists(\Statamic\Statamic::class), 503, trans('cms::app.users.statamic_required'));
+        abort_unless(Schema::hasTable('statamic_role_user'), 503, trans('cms::app.users.install_required'));
+
         $user = CmsUser::query()->findOrFail($userId);
 
         if (! (bool) $user->status) {
@@ -56,13 +63,9 @@ class CmsAccessController extends Controller
             }
         });
 
-        if (class_exists(PermissionCache::class)) {
-            app(PermissionCache::class)->clear();
-        }
+        app(PermissionCache::class)->clear();
 
-        if (class_exists(Blink::class)) {
-            Blink::forget('eloquent-user-find-'.$user->getKey());
-        }
+        Blink::forget('eloquent-user-find-'.$user->getKey());
 
         return redirect()
             ->route('admin.cms.users.index')
