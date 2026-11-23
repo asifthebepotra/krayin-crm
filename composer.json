@@ -72,26 +72,24 @@
             "Webkul\\Activity\\": "packages/Webkul/Activity/src",
             "Webkul\\Admin\\": "packages/Webkul/Admin/src",
             "Webkul\\Attribute\\": "packages/Webkul/Attribute/src",
+            "Webkul\\Automation\\": "packages/Webkul/Automation/src",
+            "Webkul\\Cms\\": "packages/Webkul/Cms/src",
             "Webkul\\Contact\\": "packages/Webkul/Contact/src",
             "Webkul\\Core\\": "packages/Webkul/Core/src",
             "Webkul\\DataGrid\\": "packages/Webkul/DataGrid/src",
             "Webkul\\DataTransfer\\": "packages/Webkul/DataTransfer/src",
-            "Webkul\\Email\\": "packages/Webkul/Email/src",
             "Webkul\\EmailTemplate\\": "packages/Webkul/EmailTemplate/src",
+            "Webkul\\Email\\": "packages/Webkul/Email/src",
             "Webkul\\GoogleContact\\": "packages/Webkul/GoogleContact/src",
-            "Webkul\\Marketing\\": "packages/Webkul/Marketing/src",
             "Webkul\\Installer\\": "packages/Webkul/Installer/src",
             "Webkul\\Lead\\": "packages/Webkul/Lead/src",
+            "Webkul\\Marketing\\": "packages/Webkul/Marketing/src",
             "Webkul\\Product\\": "packages/Webkul/Product/src",
             "Webkul\\Quote\\": "packages/Webkul/Quote/src",
             "Webkul\\Tag\\": "packages/Webkul/Tag/src",
             "Webkul\\User\\": "packages/Webkul/User/src",
             "Webkul\\Warehouse\\": "packages/Webkul/Warehouse/src",
-            "Webkul\\WebForm\\": "packages/Webkul/WebForm/src",
-            "Webkul\\Automation\\": "packages/Webkul/Automation/src"
-        },
-        "psr4": {
-            "Webkul\\Cms\\": "packages/Webkul/Cms/src"
+            "Webkul\\WebForm\\": "packages/Webkul/WebForm/src"
         }
     },
     "autoload-dev": {
