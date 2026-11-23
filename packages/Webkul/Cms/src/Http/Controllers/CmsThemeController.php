@@ -29,6 +29,8 @@ class CmsThemeController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
+        abort_unless(Schema::hasTable('cms_themes'), 503, trans('cms::app.themes.install_required'));
+
         $validated = $request->validate([
             'theme_zip' => ['required', 'file', 'mimes:zip', 'max:25600'],
         ]);
@@ -45,7 +47,11 @@ class CmsThemeController extends Controller
 
     public function activate(string $slug, string $version): RedirectResponse
     {
-        $theme = $this->themes->activate($slug, $version);
+        try {
+            $theme = $this->themes->activate($slug, $version);
+        } catch (RuntimeException $exception) {
+            return back()->withErrors(['theme' => $exception->getMessage()]);
+        }
 
         return redirect()
             ->route('admin.cms.themes.index')
