@@ -38,6 +38,7 @@ return [
         'menu'                    => 'Website settings',
         'title'                   => 'Website settings',
         'description'             => 'Configure the primary website identity and regional defaults.',
+        'install_required'        => 'Run the CMS database migrations before editing website settings.',
         'back'                    => 'Back to CMS',
         'site_name'               => 'Website name',
         'primary_domain'          => 'Primary domain',
