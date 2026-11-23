@@ -56,7 +56,9 @@ class CmsController extends Controller
         }
 
         return view('cms::index', [
-            'settings'            => $this->settingsManager->current(),
+            'settings'            => Schema::hasTable('cms_settings')
+                ? $this->settingsManager->current()
+                : new CmsSetting(['site_name' => config('app.name')]),
             'statamicInstalled'   => $statamicInstalled,
             'controlPanelEnabled' => $controlPanelEnabled,
             'controlPanelUrl'     => $controlPanelUrl,
