@@ -66,6 +66,8 @@ class CmsAccessController extends Controller
         app(PermissionCache::class)->clear();
 
         Blink::forget('eloquent-user-find-'.$user->getKey());
+        Blink::forget('eloquent-user-roles-'.$user->getKey());
+        Blink::forget('eloquent-user-groups-'.$user->getKey());
 
         return redirect()
             ->route('admin.cms.users.index')
