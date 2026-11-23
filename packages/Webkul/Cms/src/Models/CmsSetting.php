@@ -14,6 +14,8 @@ class CmsSetting extends Model
         'default_locale',
         'timezone',
         'default_lead_owner_id',
+        'active_theme_slug',
+        'active_theme_version',
     ];
 
     protected $casts = [
