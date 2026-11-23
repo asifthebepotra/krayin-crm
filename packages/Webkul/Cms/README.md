@@ -2,55 +2,57 @@
 
 The package adds Statamic CMS to Krayin CRM as a first-party module. Statamic remains the content engine and native Control Panel; Krayin remains the CRM and employee-account system.
 
-## Current module features
+## Included module features
 
-- CMS entry in the Krayin admin sidebar.
+- CMS entry and sub-navigation inside the Krayin admin sidebar.
 - CMS overview linked to the native Statamic Control Panel.
 - Website settings: name, primary domain, default locale and timezone.
 - Default owner for incoming website leads.
 - CMS access management for existing active Krayin employees.
 - Separate Statamic CMS roles: CMS Administrator, Content Editor and Content Author.
-- Shared Laravel `user` guard candidate, with Statamic-specific user casts supplied by a child model.
-- Separate CMS role/group pivot tables.
+- Shared Laravel `user` guard integration candidate, reusing the existing Krayin employee table.
+- Separate Statamic role/group assignment pivot tables.
 - Middleware that rejects inactive Krayin employees from authenticated Statamic Control Panel routes.
 - Statamic Pages collection with a published starter homepage, blog landing page and contact page.
 - Statamic Blog collection and article blueprint.
-- Main navigation and public asset container.
+- Main navigation, site global and public asset container.
 - Native Statamic contact form connected to Krayin leads.
-- Exact-email contact matching and submission idempotency.
-- Website Enquiries dashboard with processing status and links to CRM leads.
-- Statamic public homepage route takes precedence over Krayin's legacy login redirect at `/`.
+- Exact-email contact matching and idempotent submission processing.
+- Website Enquiries screen with status, totals and links to CRM leads.
+- ZIP theme installer, versioned theme storage, activation/rollback by version and removal of inactive themes.
+- Public-only, request-scoped theme view resolution and a `cms_theme:asset` Antlers tag.
+- Developer starter theme package under `examples/themes/starter/`.
+- Statamic public homepage route configured to take precedence over Krayin's legacy login redirect at `/`.
 
 ## Ownership
 
 | Data / feature | Owner |
 |---|---|
-| Employee accounts, password, active state | Krayin |
+| Employee accounts, passwords and active status | Krayin |
 | CRM roles and CRM permissions | Krayin |
 | CMS roles and content permissions | Statamic |
 | CMS role assignments to existing employees | Krayin CMS module |
 | Pages, collections, blueprints and entries | Statamic |
 | Blog content and publishing | Statamic |
-| Assets and navigation | Statamic |
+| Assets, navigation and form submissions | Statamic |
 | Website identity/default locale/domain metadata | Krayin CMS module |
-| Website form submissions | Statamic |
 | Enquiry-to-lead processing | Krayin CMS integration service |
-| Theme ZIP installation/activation | Next module increment |
+| Theme ZIP packages and active version | Krayin CMS module |
 
-The Statamic native user-management permission set is deliberately not included in the bundled CMS roles. Employee provisioning, passwords and CRM roles remain managed by Krayin.
+The Statamic native user-management permissions are deliberately excluded from the bundled CMS roles. Employee provisioning, passwords and CRM roles remain managed by Krayin.
 
-## First installation
+## First installation on the feature branch
 
 1. Install the root Composer dependencies with Statamic v6.42.0 and Inertia Laravel v2 pinned in the root `composer.json`.
-2. Run Laravel package discovery.
-3. Run Statamic's install command.
-4. Run the Krayin migrations, including the CMS module migrations.
-5. Run `php artisan cms:install` to merge the starter pages, blog, contact form, blueprints, views and CMS roles. Existing files are never overwritten.
-6. Open **Krayin → CMS → Website Settings** and select an active default lead owner.
-7. Assign CMS roles from **Krayin → CMS → CMS Access**.
-8. Open Statamic's Control Panel to edit pages and publish content.
+2. For the first targeted dependency update on a fresh checkout, use `--no-scripts`; then run `php artisan package:discover --ansi` and `php artisan statamic:install --ansi` manually.
+3. Run `php artisan migrate` to create Krayin and CMS integration tables.
+4. Run `php artisan cms:install` to copy the starter pages, blog, contact form, blueprints, views and CMS roles. It copies only missing files and does not overwrite existing website content.
+5. Open **Krayin → CMS → Website Settings** and choose an active default lead owner.
+6. Assign employee CMS roles from **Krayin → CMS → CMS Access**.
+7. Edit and publish content through Statamic's native Control Panel.
+8. Install theme ZIPs from **Krayin → CMS → Themes**.
 
-For a new checkout without `vendor/`, use the approved targeted Composer update with `--no-scripts`, then run package discovery and Statamic installation manually. Subsequent Composer operations use the Statamic scripts configured at the application root.
+Statamic Pro licensing and multi-user entitlements must be confirmed before production deployment.
 
 ## Route entry points
 
@@ -58,25 +60,42 @@ For a new checkout without `vendor/`, use the approved targeted Composer update 
 - Website settings: `/{APP_ADMIN_PATH}/cms/settings`
 - CMS access: `/{APP_ADMIN_PATH}/cms/users`
 - Website enquiries: `/{APP_ADMIN_PATH}/cms/submissions`
+- Theme manager: `/{APP_ADMIN_PATH}/cms/themes`
 - Statamic Control Panel: configured `statamic.cp.route`, default `/cp`
 - Public homepage: `/` is rendered by Statamic when Statamic frontend routes are enabled.
 
 ## Website enquiry flow
 
 1. Visitor submits the Statamic `contact` form.
-2. Statamic validates and processes the form fields.
-3. The integration listener normalizes the allowed contact fields.
-4. Existing people are matched by exact email address, case-insensitively; otherwise a person is created by Krayin's LeadRepository flow.
-5. A lead is created using Krayin's default pipeline, first stage, a configured active owner, the `Web Form` source when available (otherwise the first source), and the first lead type.
-6. The integration records success/failure in `cms_submission_logs`, keyed uniquely by Statamic form handle and submission ID.
+2. Statamic validates and stores the form submission.
+3. The integration normalizes only the allowed contact fields.
+4. Existing persons are matched by exact email address, case-insensitively; otherwise Krayin's `LeadRepository` creates the person.
+5. A Krayin lead is created using the default pipeline, first stage, the configured active owner, the `Web Form` source when available (otherwise the first source), and the first lead type.
+6. The integration stores the result in `cms_submission_logs`, with a unique form handle and Statamic submission ID to prevent duplicate leads on retries.
 7. Administrators review results under **Krayin → CMS → Website Enquiries**.
+
+## Theme ZIP format
+
+Build a ZIP from the contents of `examples/themes/starter/`, so the ZIP root contains `theme.json`, `views/` and optional `assets/`.
+
+Required:
+- `theme.json` with `name`, `slug`, `version` and `minimum_statamic_version`.
+- `views/layout.antlers.html`.
+- `views/default.antlers.html`.
+
+Allowed assets are CSS, JavaScript, common raster images and font files. The installer rejects server-side PHP, Composer files, route/provider files, hidden paths, traversal, symlinks and special filesystem entries. JavaScript is client-side theme code and should be reviewed as trusted theme content before installation.
+
+Use the Antlers tag to reference versioned theme assets:
+
+```antlers
+<link rel="stylesheet" href="{{ cms_theme:asset path='assets/css/app.css' }}">
+```
 
 ## Important implementation notes
 
 - The package does not replace the Statamic editor or create duplicate page/blog/media tables.
 - Statamic role and group definitions use file storage initially; employee assignment pivots use `statamic_role_user` and `statamic_group_user`.
-- The CMS user model extends Krayin's User model and keeps the existing `users` table.
-- Run the CMS module migrations before `php artisan cms:install`.
-- Website lead creation remains disabled in practice until an active default lead owner is selected in Website Settings.
-- The theme ZIP manager and active theme view resolver are the next implementation increment.
-- Runtime verification on a local PHP/MySQL environment is still required before production use.
+- `CmsUser` extends Krayin's existing User model; the employee identity and password remain in the existing `users` table.
+- Run the CMS integration migrations before assigning CMS roles, processing website enquiries or installing themes.
+- Website lead creation requires an active default lead owner in Website Settings.
+- Runtime verification on the local PHP/MySQL environment is still required before production use. In particular, test shared login/logout, permissions, public root routing, form processing and theme activation on the pinned dependency set.
