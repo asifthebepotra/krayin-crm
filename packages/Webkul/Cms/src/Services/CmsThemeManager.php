@@ -27,6 +27,10 @@ class CmsThemeManager
 
     public function all()
     {
+        if (! Schema::hasTable('cms_themes')) {
+            return collect();
+        }
+
         return CmsTheme::query()
             ->orderBy('name')
             ->orderByDesc('installed_at')
@@ -45,10 +49,32 @@ class CmsThemeManager
             return null;
         }
 
-        return CmsTheme::query()
+        $theme = CmsTheme::query()
             ->where('slug', $settings->active_theme_slug)
             ->where('version', $settings->active_theme_version)
             ->first();
+
+        if (! $theme) {
+            return null;
+        }
+
+        $viewsRoot = realpath(resource_path('views/cms-themes'));
+        $assetsRoot = realpath(public_path('themes'));
+        $viewsPath = realpath($theme->view_path);
+        $assetsPath = realpath($theme->asset_path);
+
+        if (
+            ! $viewsRoot
+            || ! $assetsRoot
+            || ! $viewsPath
+            || ! $assetsPath
+            || ! str_starts_with($viewsPath, $viewsRoot.DIRECTORY_SEPARATOR)
+            || ! str_starts_with($assetsPath, $assetsRoot.DIRECTORY_SEPARATOR)
+        ) {
+            return null;
+        }
+
+        return $theme;
     }
 
     /**
@@ -120,14 +146,13 @@ class CmsThemeManager
                 }
 
                 $rawName = (string) $stat['name'];
+                $isDirectory = $this->assertSafeEntryType($zip, $index);
 
-                if (str_ends_with($rawName, '/')) {
+                if ($isDirectory || str_ends_with($rawName, '/')) {
                     continue;
                 }
 
                 $name = $this->normalizeArchivePath($rawName);
-
-                $this->assertNotSymlink($zip, $index);
 
                 $size = (int) ($stat['size'] ?? 0);
                 $totalBytes += $size;
@@ -180,7 +205,10 @@ class CmsThemeManager
             File::ensureDirectoryExists($stagingViews);
             File::ensureDirectoryExists($stagingAssets);
 
-            foreach ($records as $name => $contents) {
+            foreach ($records as $record) {
+                $name = $record['name'];
+                $contents = $record['contents'];
+
                 if (str_starts_with($name, 'views/')) {
                     $relative = substr($name, strlen('views/'));
                     $destination = $stagingViews.'/'.$relative;
@@ -254,8 +282,16 @@ class CmsThemeManager
             ->where('version', $version)
             ->firstOrFail();
 
-        if (! File::isDirectory($theme->view_path)) {
-            throw new RuntimeException('The installed theme view directory is missing.');
+        $viewsRoot = realpath(resource_path('views/cms-themes'));
+        $viewsPath = realpath($theme->view_path);
+
+        if (
+            ! $viewsRoot
+            || ! $viewsPath
+            || ! str_starts_with($viewsPath, $viewsRoot.DIRECTORY_SEPARATOR)
+            || ! File::isDirectory($viewsPath)
+        ) {
+            throw new RuntimeException('The installed theme view directory is missing or invalid.');
         }
 
         $settings = CmsSetting::query()->firstOrCreate(
@@ -324,13 +360,21 @@ class CmsThemeManager
             throw new RuntimeException('Theme assets must be requested from the assets/ directory.');
         }
 
-        $path = $theme->asset_path.'/'.$relativePath;
+        $assetRoot = realpath($theme->asset_path);
+        $path = $assetRoot ? realpath($assetRoot.'/'.$relativePath) : false;
 
-        if (! File::exists($path)) {
+        if (
+            ! $assetRoot
+            || ! $path
+            || ! str_starts_with($path, $assetRoot.DIRECTORY_SEPARATOR)
+            || ! File::isFile($path)
+        ) {
             return '';
         }
 
-        return asset('themes/'.$theme->slug.'/'.$theme->version.'/'.$relativePath);
+        $encodedPath = implode('/', array_map('rawurlencode', explode('/', $relativePath)));
+
+        return asset('themes/'.$theme->slug.'/'.$theme->version.'/'.$encodedPath);
     }
 
     protected function validateManifest(array $manifest): void
@@ -341,7 +385,7 @@ class CmsThemeManager
             }
         }
 
-        if (! preg_match('/^[a-z0-9][a-z0-9-]{1,78}$/', $manifest['slug'])) {
+        if (! preg_match('/^[a-z0-9][a-z0-9-]{0,78}$/', $manifest['slug'])) {
             throw new RuntimeException('Theme slug must contain lowercase letters, numbers and hyphens only.');
         }
 
@@ -388,18 +432,30 @@ class CmsThemeManager
         return implode('/', $segments);
     }
 
-    protected function assertNotSymlink(ZipArchive $zip, int $index): void
+    protected function assertSafeEntryType(ZipArchive $zip, int $index): bool
     {
         $opsys = 0;
         $attributes = 0;
 
-        if ($zip->getExternalAttributesIndex($index, $opsys, $attributes)) {
-            $mode = ($attributes >> 16) & 0170000;
-
-            if ($mode === 0120000) {
-                throw new RuntimeException('Symbolic links are not allowed in theme archives.');
-            }
+        if (! $zip->getExternalAttributesIndex($index, $opsys, $attributes)) {
+            return false;
         }
+
+        $mode = ($attributes >> 16) & 0170000;
+
+        if ($mode === 0120000) {
+            throw new RuntimeException('Symbolic links are not allowed in theme archives.');
+        }
+
+        if ($mode === 0040000) {
+            return true;
+        }
+
+        if ($mode !== 0 && $mode !== 0100000) {
+            throw new RuntimeException('Special filesystem entries are not allowed in theme archives.');
+        }
+
+        return false;
     }
 
     protected function validateArchiveFile(string $name): void
@@ -409,7 +465,7 @@ class CmsThemeManager
         }
 
         if (str_starts_with($name, 'views/')) {
-            if (! str_ends_with(strtolower($name), '.antlers.html')) {
+            if (! str_ends_with($name, '.antlers.html')) {
                 throw new RuntimeException('Theme views must use the .antlers.html template extension.');
             }
 
