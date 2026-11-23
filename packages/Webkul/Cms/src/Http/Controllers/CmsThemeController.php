@@ -30,7 +30,7 @@ class CmsThemeController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'theme_zip' => ['required', 'file', 'max:25600'],
+            'theme_zip' => ['required', 'file', 'mimes:zip', 'max:25600'],
         ]);
 
         $theme = $this->themes->install($validated['theme_zip']);
