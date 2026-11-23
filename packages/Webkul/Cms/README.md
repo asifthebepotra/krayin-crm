@@ -94,8 +94,10 @@ Use the Antlers tag to reference versioned theme assets:
 ## Important implementation notes
 
 - The package does not replace the Statamic editor or create duplicate page/blog/media tables.
+- Enable PHP's `zip` extension in WAMP/PHP before installing theme ZIPs.
 - Statamic role and group definitions use file storage initially; employee assignment pivots use `statamic_role_user` and `statamic_group_user`.
 - `CmsUser` extends Krayin's existing User model; the employee identity and password remain in the existing `users` table.
 - Run the CMS integration migrations before assigning CMS roles, processing website enquiries or installing themes.
 - Website lead creation requires an active default lead owner in Website Settings.
 - Runtime verification on the local PHP/MySQL environment is still required before production use. In particular, test shared login/logout, permissions, public root routing, form processing and theme activation on the pinned dependency set.
+- The theme view-finder middleware temporarily prepends the active theme path during public rendering and restores it after the request. Do not use this implementation with Octane or another concurrent long-lived worker until request isolation is tested.
