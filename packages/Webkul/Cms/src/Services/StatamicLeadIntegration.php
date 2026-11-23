@@ -5,7 +5,8 @@ namespace Webkul\Cms\Services;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Schema;
+use RuntimeException;
 use Statamic\Contracts\Forms\Submission;
 use Throwable;
 use Webkul\Cms\Models\CmsUser;
@@ -40,26 +41,27 @@ class StatamicLeadIntegration
             return;
         }
 
-        $payload = $this->normalizePayload($submission->data()->all());
-
-        $settings = $this->settingsManager->current();
-
-        if (! $settings->default_lead_owner_id) {
-            throw ValidationException::withMessages([
-                'message' => trans('cms::app.forms.owner_required'),
-            ]);
-        }
+        $submissionId = (string) $submission->id();
 
         try {
+            $payload = $this->normalizePayload($submission->data()->all());
+
+            $settings = $this->settingsManager->current();
+
+            if (! $settings->default_lead_owner_id) {
+                throw new RuntimeException('No default website lead owner is configured.');
+            }
+
             DB::transaction(function () use (
                 $submission,
                 $formHandle,
+                $submissionId,
                 $payload,
                 $settings
             ) {
                 DB::table('cms_submission_logs')->insertOrIgnore([
                     'form_handle'   => $formHandle,
-                    'submission_id' => (string) $submission->id(),
+                    'submission_id' => $submissionId,
                     'status'        => 'processing',
                     'created_at'    => now(),
                     'updated_at'    => now(),
@@ -67,7 +69,7 @@ class StatamicLeadIntegration
 
                 $log = DB::table('cms_submission_logs')
                     ->where('form_handle', $formHandle)
-                    ->where('submission_id', (string) $submission->id())
+                    ->where('submission_id', $submissionId)
                     ->lockForUpdate()
                     ->first();
 
@@ -89,19 +91,19 @@ class StatamicLeadIntegration
                     ->first();
 
                 if (! $owner) {
-                    throw new \RuntimeException('The configured website lead owner is inactive or no longer exists.');
+                    throw new RuntimeException('The configured website lead owner is inactive or no longer exists.');
                 }
 
                 $pipeline = $this->pipelineRepository->getDefaultPipeline();
 
                 if (! $pipeline) {
-                    throw new \RuntimeException('No CRM lead pipeline is configured.');
+                    throw new RuntimeException('No CRM lead pipeline is configured.');
                 }
 
                 $stage = $pipeline->stages()->first();
 
                 if (! $stage) {
-                    throw new \RuntimeException('The default CRM lead pipeline has no stages.');
+                    throw new RuntimeException('The default CRM lead pipeline has no stages.');
                 }
 
                 $source = $this->sourceRepository->findOneByField('name', 'Web Form')
@@ -110,12 +112,10 @@ class StatamicLeadIntegration
                 $type = $this->typeRepository->first();
 
                 if (! $source || ! $type) {
-                    throw new \RuntimeException('CRM lead source or lead type is not configured.');
+                    throw new RuntimeException('CRM lead source or lead type is not configured.');
                 }
 
                 $person = $this->findPersonByEmail($payload['email']);
-
-                Event::dispatch('lead.create.before');
 
                 $personData = $person
                     ? ['id' => $person->id]
@@ -135,6 +135,8 @@ class StatamicLeadIntegration
                         'entity_type' => 'persons',
                         'user_id' => $owner->id,
                     ];
+
+                Event::dispatch('lead.create.before');
 
                 $lead = $this->leadRepository->create([
                     'title' => $payload['subject']
@@ -164,28 +166,35 @@ class StatamicLeadIntegration
                     ]);
             });
         } catch (Throwable $exception) {
-            DB::table('cms_submission_logs')->updateOrInsert(
-                [
-                    'form_handle' => $formHandle,
-                    'submission_id' => (string) $submission->id(),
-                ],
-                [
-                    'status' => 'failed',
-                    'error_message' => 'The submission could not be converted into a CRM lead. Check the application log.',
-                    'updated_at' => now(),
-                    'created_at' => now(),
-                ]
-            );
+            if (Schema::hasTable('cms_submission_logs')) {
+                DB::table('cms_submission_logs')->insertOrIgnore([
+                    'form_handle'   => $formHandle,
+                    'submission_id' => $submissionId,
+                    'status'        => 'failed',
+                    'created_at'    => now(),
+                    'updated_at'    => now(),
+                ]);
+
+                DB::table('cms_submission_logs')
+                    ->where('form_handle', $formHandle)
+                    ->where('submission_id', $submissionId)
+                    ->update([
+                        'status'        => 'failed',
+                        'error_message' => 'The submission could not be converted into a CRM lead. Check the application log.',
+                        'updated_at'    => now(),
+                    ]);
+            }
 
             Log::error('Statamic form could not be converted into a Krayin lead.', [
                 'form_handle' => $formHandle,
-                'submission_id' => (string) $submission->id(),
+                'submission_id' => $submissionId,
                 'exception' => $exception::class,
             ]);
 
-            throw ValidationException::withMessages([
-                'message' => trans('cms::app.forms.processing_failed'),
-            ]);
+            throw new RuntimeException(
+                trans('cms::app.forms.processing_failed'),
+                previous: $exception
+            );
         }
     }
 
@@ -208,9 +217,7 @@ class StatamicLeadIntegration
             || ! filter_var($payload['email'], FILTER_VALIDATE_EMAIL)
             || $payload['message'] === ''
         ) {
-            throw ValidationException::withMessages([
-                'message' => trans('cms::app.forms.invalid_submission'),
-            ]);
+            throw new RuntimeException('The contact form submission is missing valid required fields.');
         }
 
         return $payload;
