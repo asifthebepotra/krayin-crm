@@ -422,12 +422,20 @@ class CmsThemeManager
             throw new RuntimeException('Theme name must not exceed 150 characters.');
         }
 
+        if (mb_strlen($manifest['name']) > 150) {
+            throw new RuntimeException('Theme name must not exceed 150 characters.');
+        }
+
         if (! preg_match('/^[a-z0-9][a-z0-9-]{0,78}$/', $manifest['slug'])) {
             throw new RuntimeException('Theme slug must contain lowercase letters, numbers and hyphens only.');
         }
 
         if (mb_strlen($manifest['version']) > 40 || ! preg_match('/^\d+\.\d+\.\d+(?:[-+][A-Za-z0-9.-]+)?$/', $manifest['version'])) {
-            throw new RuntimeException('Theme version must use a semantic version such as 1.0.0.');
+            throw new RuntimeException('Theme version must use a semantic version such as 1.0.0 and be at most 40 characters.');
+        }
+
+        if (! preg_match('/^\d+\.\d+\.\d+(?:[-+][A-Za-z0-9.-]+)?$/', ltrim($manifest['minimum_statamic_version'], 'v'))) {
+            throw new RuntimeException('Minimum Statamic version must use a semantic version such as 6.42.0.');
         }
 
         $installedVersion = ltrim(Statamic::version(), 'v');
@@ -497,7 +505,7 @@ class CmsThemeManager
 
     protected function validateArchiveFile(string $name): void
     {
-        if ($name === 'theme.json' || $name === 'README.md' || preg_match('/^preview\.(png|jpg|jpeg|webp)$/i', $name)) {
+        if ($name === 'theme.json' || $name === 'README.md' || preg_match('/^preview\.(png|jpg|jpeg|webp)$/', $name)) {
             return;
         }
 
