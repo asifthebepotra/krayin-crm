@@ -5,6 +5,7 @@ namespace Webkul\Cms\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 use Statamic\Facades\YAML;
+use Webkul\Cms\Services\CmsSettingsManager;
 
 class InstallCmsCommand extends Command
 {
@@ -12,7 +13,7 @@ class InstallCmsCommand extends Command
 
     protected $description = 'Install Krayin CMS starter content and Statamic roles';
 
-    public function handle(): int
+    public function handle(CmsSettingsManager $settingsManager): int
     {
         if (! class_exists(\Statamic\Statamic::class)) {
             $this->components->error('Statamic CMS is not installed. Install the pinned Statamic dependency first.');
@@ -23,6 +24,8 @@ class InstallCmsCommand extends Command
         $this->installDefaultFiles();
 
         $this->installDefaultRoles();
+
+        $settingsManager->current();
 
         $this->components->info('Krayin CMS starter content is ready.');
         $this->components->info('Krayin manages employee accounts. Assign CMS roles from the CMS Access screen.');
