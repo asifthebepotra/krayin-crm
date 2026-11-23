@@ -8,22 +8,41 @@ return new class extends Migration
 {
     public function up(): void
     {
+        $missing = [];
+
+        if (! Schema::hasColumn('users', 'super')) {
+            $missing[] = 'super';
+        }
+
+        if (! Schema::hasColumn('users', 'avatar')) {
+            $missing[] = 'avatar';
+        }
+
         if (! Schema::hasColumn('users', 'preferences')) {
-            Schema::table('users', function (Blueprint $table) {
-                $table->json('preferences')->nullable();
-            });
+            $missing[] = 'preferences';
         }
 
         if (! Schema::hasColumn('users', 'last_login')) {
-            Schema::table('users', function (Blueprint $table) {
-                $table->timestamp('last_login')->nullable();
+            $missing[] = 'last_login';
+        }
+
+        if ($missing) {
+            Schema::table('users', function (Blueprint $table) use ($missing) {
+                foreach ($missing as $column) {
+                    match ($column) {
+                        'super' => $table->boolean('super')->default(false),
+                        'avatar' => $table->string('avatar')->nullable(),
+                        'preferences' => $table->json('preferences')->nullable(),
+                        'last_login' => $table->timestamp('last_login')->nullable(),
+                    };
+                }
             });
         }
 
         Schema::create('statamic_role_user', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedInteger('user_id');
-            $table->string('role_id', 100);
+            $table->string('role_id');
             $table->unique(['user_id', 'role_id']);
             $table->foreign('user_id')->references('id')->on('users')->cascadeOnDelete();
         });
@@ -31,7 +50,7 @@ return new class extends Migration
         Schema::create('statamic_group_user', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedInteger('user_id');
-            $table->string('group_id', 100);
+            $table->string('group_id');
             $table->unique(['user_id', 'group_id']);
             $table->foreign('user_id')->references('id')->on('users')->cascadeOnDelete();
         });
@@ -42,15 +61,14 @@ return new class extends Migration
         Schema::dropIfExists('statamic_group_user');
         Schema::dropIfExists('statamic_role_user');
 
-        if (Schema::hasColumn('users', 'last_login')) {
-            Schema::table('users', function (Blueprint $table) {
-                $table->dropColumn('last_login');
-            });
-        }
+        $columns = array_filter(
+            ['super', 'avatar', 'preferences', 'last_login'],
+            fn ($column) => Schema::hasColumn('users', $column)
+        );
 
-        if (Schema::hasColumn('users', 'preferences')) {
-            Schema::table('users', function (Blueprint $table) {
-                $table->dropColumn('preferences');
+        if ($columns) {
+            Schema::table('users', function (Blueprint $table) use ($columns) {
+                $table->dropColumn($columns);
             });
         }
     }
