@@ -12,9 +12,7 @@
             <meta property="og:image" content="{{ url }}">
         {{ /social_image }}
     {{ /if }}
-    {{ cms_theme:asset path="assets/css/app.css" }}
-        <link rel="stylesheet" href="{{ value }}">
-    {{ /cms_theme:asset }}
+    <link rel="stylesheet" href="{{ cms_theme:asset path='assets/css/app.css' }}">
 </head>
 <body>
     <header class="site-header">
