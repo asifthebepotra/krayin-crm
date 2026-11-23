@@ -3,20 +3,6 @@ cms_admin:
   permissions:
     - access cp
     - configure collections
-    - configure navs
-    - view main nav
-    - edit main nav
-    - configure globals
-    - edit site globals
-    - configure taxonomies
-    - configure asset containers
-    - view assets assets
-    - upload assets assets
-    - edit assets assets
-    - edit assets folders
-    - configure forms
-    - configure fields
-    - configure form fields
     - view pages entries
     - edit pages entries
     - create pages entries
@@ -27,6 +13,20 @@ cms_admin:
     - create blog entries
     - publish blog entries
     - delete blog entries
+    - configure navs
+    - view main nav
+    - edit main nav
+    - configure globals
+    - configure taxonomies
+    - configure asset containers
+    - view assets assets
+    - upload assets assets
+    - edit assets assets
+    - edit assets folders
+    - configure forms
+    - view contact form submissions
+    - configure fields
+    - configure form fields
 
 cms_editor:
   title: Content Editor
