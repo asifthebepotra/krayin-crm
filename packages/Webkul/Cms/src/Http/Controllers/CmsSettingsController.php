@@ -5,7 +5,6 @@ namespace Webkul\Cms\Http\Controllers;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 use Webkul\Cms\Services\CmsSettingsManager;
 
