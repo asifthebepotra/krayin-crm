@@ -13,4 +13,10 @@ return [
         'route' => 'admin.cms.settings.edit',
         'sort'  => 1,
     ],
+    [
+        'key'   => 'cms.users',
+        'name'  => 'cms::app.users.menu',
+        'route' => ['admin.cms.users.index', 'admin.cms.users.update'],
+        'sort'  => 2,
+    ],
 ];
