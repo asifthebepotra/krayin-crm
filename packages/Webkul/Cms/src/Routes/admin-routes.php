@@ -1,7 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use Webkul\Cms\Http\Controllers\CmsController;
+use Illuminate\\Support\\Facades\\Route;
+use Webkul\\Cms\\Http\\Controllers\\CmsController;
+use Webkul\\Cms\\Http\\Controllers\\CmsSettingsController;
 
 Route::middleware(['web', 'admin_locale', 'user'])
     ->prefix(trim(config('app.admin_path', 'admin'), '/'))
