@@ -16,4 +16,11 @@ return [
         'sort'       => 1,
         'icon-class' => '',
     ],
+    [
+        'key'        => 'cms.users',
+        'name'       => 'cms::app.users.menu',
+        'route'      => 'admin.cms.users.index',
+        'sort'       => 2,
+        'icon-class' => '',
+    ],
 ];
