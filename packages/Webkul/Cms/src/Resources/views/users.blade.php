@@ -62,24 +62,24 @@
 
                                         <select
                                             name="role"
-                                            @disabled(! $user->status)
                                             class="min-h-[38px] flex-1 rounded-md border border-gray-300 bg-white px-3 text-sm text-gray-700 dark:border-gray-700 dark:bg-gray-950 dark:text-white"
                                         >
                                             <option value="">@lang('cms::app.users.no_access')</option>
 
-                                            @foreach ($roles as $handle => $label)
-                                                <option
-                                                    value="{{ $handle }}"
-                                                    @selected(($assignments[$user->id] ?? null) === $handle)
-                                                >
-                                                    {{ $label }}
-                                                </option>
-                                            @endforeach
+                                            @if ($user->status)
+                                                @foreach ($roles as $handle => $label)
+                                                    <option
+                                                        value="{{ $handle }}"
+                                                        @selected(($assignments[$user->id] ?? null) === $handle)
+                                                    >
+                                                        {{ $label }}
+                                                    </option>
+                                                @endforeach
+                                            @endif
                                         </select>
 
                                         <button
                                             type="submit"
-                                            @disabled(! $user->status)
                                             class="secondary-button"
                                         >
                                             @lang('cms::app.users.save')
