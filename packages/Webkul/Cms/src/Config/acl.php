@@ -25,4 +25,15 @@ return [
         'route' => 'admin.cms.submissions.index',
         'sort'  => 3,
     ],
+    [
+        'key'   => 'cms.themes',
+        'name'  => 'cms::app.themes.menu',
+        'route' => [
+            'admin.cms.themes.index',
+            'admin.cms.themes.store',
+            'admin.cms.themes.activate',
+            'admin.cms.themes.destroy',
+        ],
+        'sort'  => 4,
+    ],
 ];
