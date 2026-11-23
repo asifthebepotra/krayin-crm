@@ -164,9 +164,13 @@ class CmsThemeManager
 
                 $this->validateArchiveFile($name);
 
-                if (isset($records[$name])) {
-                    throw new RuntimeException('The archive contains duplicate file paths.');
+                $pathKey = strtolower($name);
+
+                if (isset($seenPaths[$pathKey])) {
+                    throw new RuntimeException('The archive contains duplicate or case-colliding file paths.');
                 }
+
+                $seenPaths[$pathKey] = true;
 
                 $contents = $zip->getFromIndex($index);
 
