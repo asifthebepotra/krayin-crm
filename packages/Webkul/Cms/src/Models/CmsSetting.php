@@ -13,5 +13,10 @@ class CmsSetting extends Model
         'primary_domain',
         'default_locale',
         'timezone',
+        'default_lead_owner_id',
+    ];
+
+    protected $casts = [
+        'default_lead_owner_id' => 'integer',
     ];
 }
