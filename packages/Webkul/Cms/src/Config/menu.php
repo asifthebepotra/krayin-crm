@@ -23,4 +23,11 @@ return [
         'sort'       => 2,
         'icon-class' => '',
     ],
+    [
+        'key'        => 'cms.submissions',
+        'name'       => 'cms::app.submissions.menu',
+        'route'      => 'admin.cms.submissions.index',
+        'sort'       => 3,
+        'icon-class' => '',
+    ],
 ];
