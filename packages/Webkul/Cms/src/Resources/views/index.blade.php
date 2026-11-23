@@ -15,21 +15,22 @@
                 </p>
             </div>
 
-            @if ($controlPanelEnabled)
-                <a
-                    href="{{ $controlPanelUrl }}"
-                    class="primary-button"
-                >
-                    @lang('cms::app.general.open_control_panel')
+            <div class="flex flex-wrap gap-2">
+                <a href="{{ route('admin.cms.settings.edit') }}" class="secondary-button">
+                    @lang('cms::app.general.manage_settings')
                 </a>
-            @endif
+
+                @if ($controlPanelEnabled)
+                    <a href="{{ $controlPanelUrl }}" class="primary-button">
+                        @lang('cms::app.general.open_control_panel')
+                    </a>
+                @endif
+            </div>
         </div>
 
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
             <div class="rounded-lg border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900">
-                <p class="text-sm font-medium text-gray-500 dark:text-gray-400">
-                    Statamic CMS
-                </p>
+                <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Statamic CMS</p>
 
                 <p class="mt-2 text-lg font-semibold dark:text-white">
                     @if ($statamicInstalled)
@@ -48,62 +49,63 @@
 
             <div class="rounded-lg border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900">
                 <p class="text-sm font-medium text-gray-500 dark:text-gray-400">
-                    @lang('cms::app.general.native_editor')
+                    @lang('cms::app.general.site_name')
                 </p>
 
-                <p class="mt-2 text-sm text-gray-600 dark:text-gray-300">
-                    @lang('cms::app.general.native_editor_info')
+                <p class="mt-2 text-lg font-semibold dark:text-white">
+                    {{ $settings->site_name ?: config('app.name') }}
                 </p>
             </div>
 
             <div class="rounded-lg border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900">
                 <p class="text-sm font-medium text-gray-500 dark:text-gray-400">
-                    @lang('cms::app.general.crm_integration')
+                    @lang('cms::app.general.primary_domain')
                 </p>
 
-                <p class="mt-2 text-sm text-gray-600 dark:text-gray-300">
-                    @lang('cms::app.general.crm_integration_info')
+                <p class="mt-2 text-lg font-semibold dark:text-white">
+                    {{ $settings->primary_domain ?: __('cms::app.general.not_configured') }}
                 </p>
             </div>
         </div>
 
-        @unless ($statamicInstalled)
-            <div class="rounded-lg border border-amber-300 bg-amber-50 p-5 dark:border-amber-800 dark:bg-amber-950">
-                <h2 class="font-semibold text-amber-900 dark:text-amber-200">
-                    @lang('cms::app.general.statamic_missing')
+        <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
+            <div class="rounded-lg border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900">
+                <h2 class="font-semibold dark:text-white">
+                    @lang('cms::app.general.native_editor')
                 </h2>
 
-                <p class="mt-2 text-sm text-amber-800 dark:text-amber-300">
-                    @lang('cms::app.general.installation_hint')
+                <p class="mt-2 text-sm text-gray-600 dark:text-gray-300">
+                    @lang('cms::app.general.native_editor_info')
                 </p>
-            </div>
-        @elseif (! $controlPanelEnabled)
-            <div class="rounded-lg border border-amber-300 bg-amber-50 p-5 dark:border-amber-800 dark:bg-amber-950">
-                <p class="text-sm text-amber-800 dark:text-amber-300">
-                    @lang('cms::app.general.control_panel_disabled')
-                </p>
-            </div>
-        @else
-            <div class="rounded-lg border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900">
-                <div class="flex flex-wrap items-center justify-between gap-3">
-                    <div>
-                        <h2 class="font-semibold dark:text-white">
-                            @lang('cms::app.general.control_panel_enabled')
-                        </h2>
 
-                        <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">
-                            {{ $controlPanelUrl }}
-                        </p>
-                    </div>
-
-                    <a
-                        href="{{ $controlPanelUrl }}"
-                        class="secondary-button"
-                    >
+                @if ($controlPanelEnabled)
+                    <a href="{{ $controlPanelUrl }}" class="secondary-button mt-4">
                         @lang('cms::app.general.open_control_panel')
                     </a>
-                </div>
+                @elseif ($statamicInstalled)
+                    <p class="mt-4 text-sm text-amber-700 dark:text-amber-300">
+                        @lang('cms::app.general.control_panel_disabled')
+                    </p>
+                @else
+                    <p class="mt-4 text-sm text-amber-700 dark:text-amber-300">
+                        @lang('cms::app.general.installation_hint')
+                    </p>
+                @endif
             </div>
-        @endunless
+
+            <div class="rounded-lg border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900">
+                <h2 class="font-semibold dark:text-white">
+                    @lang('cms::app.general.crm_integration')
+                </h2>
+
+                <p class="mt-2 text-sm text-gray-600 dark:text-gray-300">
+                    @lang('cms::app.general.crm_integration_info')
+                </p>
+
+                <a href="{{ route('admin.cms.settings.edit') }}" class="secondary-button mt-4">
+                    @lang('cms::app.general.manage_settings')
+                </a>
+            </div>
+        </div>
     </div>
 </x-admin::layouts>
