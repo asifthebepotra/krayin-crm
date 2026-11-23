@@ -171,7 +171,7 @@ class StatamicLeadIntegration
                 ],
                 [
                     'status' => 'failed',
-                    'error_message' => mb_substr($exception->getMessage(), 0, 2000),
+                    'error_message' => 'The submission could not be converted into a CRM lead. Check the application log.',
                     'updated_at' => now(),
                     'created_at' => now(),
                 ]
