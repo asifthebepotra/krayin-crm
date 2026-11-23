@@ -61,15 +61,10 @@ return new class extends Migration
         Schema::dropIfExists('statamic_group_user');
         Schema::dropIfExists('statamic_role_user');
 
-        $columns = array_filter(
-            ['super', 'avatar', 'preferences', 'last_login'],
-            fn ($column) => Schema::hasColumn('users', $column)
-        );
-
-        if ($columns) {
-            Schema::table('users', function (Blueprint $table) use ($columns) {
-                $table->dropColumn($columns);
-            });
-        }
+        /*
+         * Keep the Statamic-compatible employee columns on rollback. Some
+         * may have existed before this package was installed; dropping them
+         * could destroy user preferences or other extension data.
+         */
     }
 };
