@@ -1,0 +1,71 @@
+<article>
+    <header class="site-hero">
+        <h1>{{ hero_heading ?? title }}</h1>
+        {{ if hero_subtitle }}
+            <p>{{ hero_subtitle }}</p>
+        {{ /if }}
+    </header>
+
+    <section class="site-content">
+        {{ if content }}
+            <div style="margin-bottom: 28px;">{{ content }}</div>
+        {{ /if }}
+
+        {{ form:contact }}
+            {{ if errors }}
+                <div role="alert" style="padding: 14px; margin-bottom: 18px; border: 1px solid #f2b8b5; background: #fff4f3; border-radius: 8px;">
+                    <strong>Please review the form.</strong>
+                    {{ errors }}
+                        <p style="margin: 6px 0 0;">{{ value }}</p>
+                    {{ /errors }}
+                </div>
+            {{ /if }}
+
+            {{ if success }}
+                <div role="status" style="padding: 14px; margin-bottom: 18px; border: 1px solid #a8d7ba; background: #effaf2; border-radius: 8px;">
+                    Thank you. Your enquiry has been received.
+                </div>
+            {{ /if }}
+
+            {{ honeypot }}
+
+            <div style="display: grid; gap: 16px;">
+                <label>
+                    <span>Full name *</span>
+                    <input name="name" type="text" value="{{ old:name }}" required maxlength="150" style="display:block; width:100%; margin-top:6px; padding:12px; border:1px solid #cbd5cf; border-radius:8px;">
+                </label>
+
+                <label>
+                    <span>Email address *</span>
+                    <input name="email" type="email" value="{{ old:email }}" required maxlength="190" style="display:block; width:100%; margin-top:6px; padding:12px; border:1px solid #cbd5cf; border-radius:8px;">
+                </label>
+
+                <label>
+                    <span>Phone number</span>
+                    <input name="phone" type="tel" value="{{ old:phone }}" maxlength="50" style="display:block; width:100%; margin-top:6px; padding:12px; border:1px solid #cbd5cf; border-radius:8px;">
+                </label>
+
+                <label>
+                    <span>Company</span>
+                    <input name="company" type="text" value="{{ old:company }}" maxlength="190" style="display:block; width:100%; margin-top:6px; padding:12px; border:1px solid #cbd5cf; border-radius:8px;">
+                </label>
+
+                <label>
+                    <span>Subject</span>
+                    <input name="subject" type="text" value="{{ old:subject }}" maxlength="190" style="display:block; width:100%; margin-top:6px; padding:12px; border:1px solid #cbd5cf; border-radius:8px;">
+                </label>
+
+                <label>
+                    <span>Message *</span>
+                    <textarea name="message" rows="6" required maxlength="10000" style="display:block; width:100%; margin-top:6px; padding:12px; border:1px solid #cbd5cf; border-radius:8px;">{{ old:message }}</textarea>
+                </label>
+
+                <div>
+                    <button type="submit" style="padding:12px 20px; border:0; border-radius:8px; color:#fff; background:#005a44; font-weight:700; cursor:pointer;">
+                        Send enquiry
+                    </button>
+                </div>
+            </div>
+        {{ /form:contact }}
+    </section>
+</article>
