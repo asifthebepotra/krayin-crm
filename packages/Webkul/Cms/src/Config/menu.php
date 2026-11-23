@@ -30,4 +30,11 @@ return [
         'sort'       => 3,
         'icon-class' => '',
     ],
+    [
+        'key'        => 'cms.themes',
+        'name'       => 'cms::app.themes.menu',
+        'route'      => 'admin.cms.themes.index',
+        'sort'       => 4,
+        'icon-class' => '',
+    ],
 ];
