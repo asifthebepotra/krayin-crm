@@ -232,8 +232,7 @@ class CmsThemeManager
                     $relative = substr($name, strlen('views/'));
                     $destination = $stagingViews.'/'.$relative;
                 } elseif (str_starts_with($name, 'assets/')) {
-                    $relative = substr($name, strlen('assets/'));
-                    $destination = $stagingAssets.'/assets/'.$relative;
+                    $destination = $stagingAssets.'/'.$name;
                 } elseif (str_starts_with($name, 'preview.')) {
                     $destination = $stagingAssets.'/'.$name;
                 } else {
@@ -416,10 +415,6 @@ class CmsThemeManager
             if (! isset($manifest[$key]) || ! is_string($manifest[$key]) || trim($manifest[$key]) === '') {
                 throw new RuntimeException("The theme manifest requires a non-empty {$key}.");
             }
-        }
-
-        if (mb_strlen($manifest['name']) > 150) {
-            throw new RuntimeException('Theme name must not exceed 150 characters.');
         }
 
         if (mb_strlen($manifest['name']) > 150) {
