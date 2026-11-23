@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Webkul\Cms\Http\Controllers\CmsAccessController;
 use Webkul\Cms\Http\Controllers\CmsController;
 use Webkul\Cms\Http\Controllers\CmsSettingsController;
+use Webkul\Cms\Http\Controllers\CmsSubmissionController;
 
 Route::middleware(['web', 'admin_locale', 'user'])
     ->prefix(trim(config('app.admin_path', 'admin'), '/'))
@@ -24,4 +25,7 @@ Route::middleware(['web', 'admin_locale', 'user'])
         Route::put('cms/users/{userId}', [CmsAccessController::class, 'update'])
             ->whereNumber('userId')
             ->name('cms.users.update');
+
+        Route::get('cms/submissions', [CmsSubmissionController::class, 'index'])
+            ->name('cms.submissions.index');
     });
