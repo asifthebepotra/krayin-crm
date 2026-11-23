@@ -68,6 +68,39 @@
             </div>
         </div>
 
+        <div class="rounded-lg border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900">
+            <div class="flex flex-wrap items-center justify-between gap-4">
+                <div>
+                    <h2 class="font-semibold dark:text-white">
+                        @lang('cms::app.submissions.title')
+                    </h2>
+
+                    <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">
+                        @lang('cms::app.submissions.description')
+                    </p>
+                </div>
+
+                <a href="{{ route('admin.cms.submissions.index') }}" class="secondary-button">
+                    @lang('cms::app.general.view_submissions')
+                </a>
+            </div>
+
+            <div class="mt-5 grid grid-cols-3 gap-3">
+                <div>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">@lang('cms::app.submissions.total')</p>
+                    <p class="mt-1 text-2xl font-semibold dark:text-white">{{ number_format($submissionSummary['total']) }}</p>
+                </div>
+                <div>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">@lang('cms::app.submissions.completed')</p>
+                    <p class="mt-1 text-2xl font-semibold text-green-700 dark:text-green-400">{{ number_format($submissionSummary['completed']) }}</p>
+                </div>
+                <div>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">@lang('cms::app.submissions.failed')</p>
+                    <p class="mt-1 text-2xl font-semibold text-red-700 dark:text-red-400">{{ number_format($submissionSummary['failed']) }}</p>
+                </div>
+            </div>
+        </div>
+
         <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
             <div class="rounded-lg border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900">
                 <h2 class="font-semibold dark:text-white">
