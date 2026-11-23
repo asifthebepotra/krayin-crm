@@ -1,13 +1,13 @@
 <?php
 
-namespace Webkul\\Cms\\Providers;
+namespace Webkul\Cms\Providers;
 
-use Illuminate\\Routing\\Router;
-use Illuminate\\Support\\Facades\\Route;
-use Illuminate\\Support\\ServiceProvider;
-use Statamic\\Http\\Controllers\\FrontendController;
-use Webkul\\Cms\\Http\\Middleware\\EnsureActiveKrayinUser;
-use Webkul\\Cms\\Models\\CmsUser;
+use Illuminate\Routing\Router;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\ServiceProvider;
+use Statamic\Http\Controllers\FrontendController;
+use Webkul\Cms\Http\Middleware\EnsureActiveKrayinUser;
+use Webkul\Cms\Models\CmsUser;
 
 class CmsServiceProvider extends ServiceProvider
 {
@@ -23,9 +23,9 @@ class CmsServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(dirname(__DIR__).'/Config/acl.php', 'acl');
 
         /*
-         * Statamic's Eloquent user repository resolves its model from the
-         * configured CP guard's Laravel provider. Keep Krayin's existing
-         * "user" guard and use a subclass which adds only Statamic casts.
+         * Statamic resolves its Eloquent user model from the CP guard's
+         * Laravel provider. Keep Krayin's existing "user" guard and use a
+         * subclass which adds only Statamic-specific casts.
          */
         config([
             'auth.providers.users.model' => CmsUser::class,
@@ -60,11 +60,11 @@ class CmsServiceProvider extends ServiceProvider
 
         if ($this->app->runningInConsole()) {
             $this->commands([
-                \\Webkul\\Cms\\Console\\Commands\\InstallCmsCommand::class,
+                \Webkul\Cms\Console\Commands\InstallCmsCommand::class,
             ]);
         }
 
-        if (! class_exists(\\Statamic\\Statamic::class)) {
+        if (! class_exists(\Statamic\Statamic::class)) {
             return;
         }
 
