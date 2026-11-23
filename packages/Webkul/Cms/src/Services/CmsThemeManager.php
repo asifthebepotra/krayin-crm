@@ -83,6 +83,12 @@ class CmsThemeManager
      */
     public function install(UploadedFile $archive): CmsTheme
     {
+        if (! Schema::hasTable('cms_themes') || ! Schema::hasTable('cms_settings')) {
+            throw ValidationException::withMessages([
+                'theme_zip' => 'Run the CMS database migrations before installing a theme.',
+            ]);
+        }
+
         if (! class_exists(ZipArchive::class)) {
             throw ValidationException::withMessages([
                 'theme_zip' => 'The PHP ZIP extension is required to install themes.',
@@ -122,6 +128,10 @@ class CmsThemeManager
             }
 
             $manifest = json_decode($manifestContent, true, 512, JSON_THROW_ON_ERROR);
+
+            if (! is_array($manifest) || array_is_list($manifest)) {
+                throw new RuntimeException('The theme manifest must be a JSON object.');
+            }
 
             $this->validateManifest($manifest);
 
@@ -398,7 +408,7 @@ class CmsThemeManager
             throw new RuntimeException('Theme slug must contain lowercase letters, numbers and hyphens only.');
         }
 
-        if (! preg_match('/^\d+\.\d+\.\d+(?:[-+][A-Za-z0-9.-]+)?$/', $manifest['version'])) {
+        if (mb_strlen($manifest['version']) > 40 || ! preg_match('/^\d+\.\d+\.\d+(?:[-+][A-Za-z0-9.-]+)?$/', $manifest['version'])) {
             throw new RuntimeException('Theme version must use a semantic version such as 1.0.0.');
         }
 
