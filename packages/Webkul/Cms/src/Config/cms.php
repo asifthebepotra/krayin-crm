@@ -6,9 +6,8 @@ return [
     | Statamic Control Panel
     |--------------------------------------------------------------------------
     |
-    | The Statamic Control Panel remains the native CMS editing interface.
-    | This package only provides the Krayin entry point and integration
-    | services around it.
+    | Statamic remains the native website editor. The Krayin CMS module
+    | links to its Control Panel and provides the integration layer.
     |
     */
 
@@ -16,13 +15,25 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | CRM Homepage
+    | Public Homepage
     |--------------------------------------------------------------------------
-    |
-    | Public website routing is owned by Statamic. Krayin's default root
-    | redirect must be reviewed when Statamic is enabled.
-    |
     */
 
     'public_homepage' => 'statamic',
+
+    /*
+    |--------------------------------------------------------------------------
+    | CMS Roles
+    |--------------------------------------------------------------------------
+    |
+    | These role handles must match the keys in resources/users/roles.yaml.
+    | CRM roles and CMS roles are intentionally managed independently.
+    |
+    */
+
+    'roles' => [
+        'cms_admin'  => 'CMS Administrator',
+        'cms_editor' => 'Content Editor',
+        'cms_author' => 'Content Author',
+    ],
 ];
