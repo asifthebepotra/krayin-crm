@@ -10,7 +10,7 @@ return [
     [
         'key'   => 'cms.settings',
         'name'  => 'cms::app.settings.menu',
-        'route' => 'admin.cms.settings.edit',
+        'route' => ['admin.cms.settings.edit', 'admin.cms.settings.update'],
         'sort'  => 1,
     ],
     [
