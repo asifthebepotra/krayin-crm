@@ -1,10 +1,10 @@
 <?php
 
-namespace Webkul\\Cms\\Http\\Controllers;
+namespace Webkul\Cms\Http\Controllers;
 
-use Illuminate\\Routing\\Controller;
-use Illuminate\\View\\View;
-use Webkul\\Cms\\Services\\CmsSettingsManager;
+use Illuminate\Routing\Controller;
+use Illuminate\View\View;
+use Webkul\Cms\Services\CmsSettingsManager;
 
 class CmsController extends Controller
 {
@@ -17,7 +17,7 @@ class CmsController extends Controller
      */
     public function index(): View
     {
-        $statamicInstalled = class_exists(\\Statamic\\Statamic::class);
+        $statamicInstalled = class_exists(\Statamic\Statamic::class);
 
         $controlPanelEnabled = $statamicInstalled
             && (bool) config('statamic.cp.enabled', true);
@@ -33,18 +33,18 @@ class CmsController extends Controller
 
         if (
             $statamicInstalled
-            && class_exists(\\Composer\\InstalledVersions::class)
-            && \\Composer\\InstalledVersions::isInstalled('statamic/cms')
+            && class_exists(\Composer\InstalledVersions::class)
+            && \Composer\InstalledVersions::isInstalled('statamic/cms')
         ) {
-            $statamicVersion = \\Composer\\InstalledVersions::getPrettyVersion('statamic/cms');
+            $statamicVersion = \Composer\InstalledVersions::getPrettyVersion('statamic/cms');
         }
 
         return view('cms::index', [
-            'settings'           => $this->settingsManager->current(),
-            'statamicInstalled'  => $statamicInstalled,
-            'controlPanelEnabled'=> $controlPanelEnabled,
-            'controlPanelUrl'    => $controlPanelUrl,
-            'statamicVersion'    => $statamicVersion,
+            'settings'            => $this->settingsManager->current(),
+            'statamicInstalled'   => $statamicInstalled,
+            'controlPanelEnabled' => $controlPanelEnabled,
+            'controlPanelUrl'     => $controlPanelUrl,
+            'statamicVersion'     => $statamicVersion,
         ]);
     }
 }
