@@ -107,6 +107,37 @@
                             <p class="text-xs text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
+
+                    <div class="grid gap-2 md:col-span-2">
+                        <label for="default_lead_owner_id" class="text-sm font-medium text-gray-700 dark:text-gray-200">
+                            @lang('cms::app.settings.default_lead_owner')
+                        </label>
+
+                        <select
+                            id="default_lead_owner_id"
+                            name="default_lead_owner_id"
+                            class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 focus:border-blue-500 focus:outline-none dark:border-gray-700 dark:bg-gray-950 dark:text-white"
+                        >
+                            <option value="">@lang('cms::app.settings.select_lead_owner')</option>
+
+                            @foreach ($employees as $employee)
+                                <option
+                                    value="{{ $employee->id }}"
+                                    @selected((string) old('default_lead_owner_id', $settings->default_lead_owner_id) === (string) $employee->id)
+                                >
+                                    {{ $employee->name }} — {{ $employee->email }}
+                                </option>
+                            @endforeach
+                        </select>
+
+                        <p class="text-xs text-gray-500 dark:text-gray-400">
+                            @lang('cms::app.settings.default_lead_owner_help')
+                        </p>
+
+                        @error('default_lead_owner_id')
+                            <p class="text-xs text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
                 </div>
 
                 <div class="mt-6 flex justify-end">
