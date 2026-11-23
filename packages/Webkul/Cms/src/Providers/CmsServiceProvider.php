@@ -69,25 +69,29 @@ class CmsServiceProvider extends ServiceProvider
         }
 
         /*
-         * Krayin's Bouncer protects CRM routes. Statamic uses its own CP
-         * authorization pipeline, so account status must be checked here.
+         * Wait until Statamic's CP middleware group and public routes have
+         * been registered by its own providers. This avoids our middleware
+         * being overwritten by a later middlewareGroup() call.
          */
-        $router->prependMiddlewareToGroup(
-            'statamic.cp.authenticated',
-            EnsureActiveKrayinUser::class
-        );
+        $this->app->booted(function () use ($router) {
+            $router->prependMiddlewareToGroup(
+                'statamic.cp.authenticated',
+                EnsureActiveKrayinUser::class
+            );
 
-        /*
-         * Krayin's legacy GET / route redirects to the admin login. Once
-         * Statamic is available, let its native FrontendController own /.
-         */
-        if (
-            config('cms.public_homepage') === 'statamic'
-            && config('statamic.routes.enabled', true)
-        ) {
-            Route::middleware(config('statamic.routes.middleware', 'web'))
-                ->get('/', [FrontendController::class, 'index'])
-                ->name('cms.public.home');
-        }
+            /*
+             * Krayin's legacy GET / route redirects to the admin login.
+             * Register the exact Statamic frontend root after all providers
+             * have registered routes, so the public homepage owns /.
+             */
+            if (
+                config('cms.public_homepage') === 'statamic'
+                && config('statamic.routes.enabled', true)
+            ) {
+                Route::middleware(config('statamic.routes.middleware', 'web'))
+                    ->get('/', [FrontendController::class, 'index'])
+                    ->name('cms.public.home');
+            }
+        });
     }
 }
