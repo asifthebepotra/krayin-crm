@@ -45,4 +45,21 @@ return [
         'save'                => 'Save settings',
         'updated'             => 'Website settings have been saved.',
     ],
+
+    'users' => [
+        'menu'          => 'CMS Access',
+        'title'         => 'CMS user access',
+        'description'   => 'Grant active Krayin employees access to the Statamic Control Panel.',
+        'notice'        => 'Employee accounts, passwords and CRM roles remain managed by Krayin. This screen only assigns a CMS role.',
+        'employee'      => 'Employee',
+        'status'        => 'Account status',
+        'active'        => 'Active',
+        'inactive'      => 'Inactive',
+        'cms_role'      => 'CMS role',
+        'no_access'     => 'No CMS access',
+        'save'          => 'Save',
+        'empty'         => 'No employees found.',
+        'updated'       => 'CMS access has been updated.',
+        'inactive_user' => 'CMS access cannot be granted to an inactive Krayin employee.',
+    ],
 ];
