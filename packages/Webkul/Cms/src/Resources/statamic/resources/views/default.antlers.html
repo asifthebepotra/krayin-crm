@@ -1,0 +1,14 @@
+<article>
+    <header class="site-hero">
+        <h1>{{ hero_heading ?? title }}</h1>
+        {{ if hero_subtitle }}
+            <p>{{ hero_subtitle }}</p>
+        {{ /if }}
+    </header>
+
+    {{ if content }}
+        <div class="site-content">
+            {{ content }}
+        </div>
+    {{ /if }}
+</article>
