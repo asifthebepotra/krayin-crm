@@ -8,8 +8,10 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Statamic\Http\Controllers\FrontendController;
 use Webkul\Cms\Http\Middleware\EnsureActiveKrayinUser;
+use Webkul\Cms\Http\Middleware\ResolveCmsTheme;
 use Webkul\Cms\Listeners\CreateKrayinLeadFromStatamicForm;
 use Webkul\Cms\Models\CmsUser;
+use Webkul\Cms\Tags\CmsTheme as CmsThemeTag;
 
 class CmsServiceProvider extends ServiceProvider
 {
@@ -71,12 +73,16 @@ class CmsServiceProvider extends ServiceProvider
         }
 
         /*
-         * Wait until Statamic's CP middleware group and public routes have
-         * been registered by its own providers. This avoids our middleware
-         * being overwritten by a later middlewareGroup() call.
+         * Wait until Statamic's providers have registered their extension
+         * bindings, route groups and public frontend routes.
          */
         $this->app->booted(function () use ($router) {
-            Event::listen(\Statamic\Events\FormSubmitted::class, CreateKrayinLeadFromStatamicForm::class);
+            Event::listen(
+                \Statamic\Events\FormSubmitted::class,
+                CreateKrayinLeadFromStatamicForm::class
+            );
+
+            CmsThemeTag::register();
 
             $router->prependMiddlewareToGroup(
                 'statamic.cp.authenticated',
@@ -84,9 +90,8 @@ class CmsServiceProvider extends ServiceProvider
             );
 
             /*
-             * Krayin's legacy GET / route redirects to the admin login.
-             * Register the exact Statamic frontend root after all providers
-             * have registered routes, so the public homepage owns /.
+             * Krayin's legacy GET / route redirects to admin login. Register
+             * Statamic's frontend controller at the root after all providers.
              */
             if (
                 config('cms.public_homepage') === 'statamic'
@@ -95,6 +100,22 @@ class CmsServiceProvider extends ServiceProvider
                 Route::middleware(config('statamic.routes.middleware', 'web'))
                     ->get('/', [FrontendController::class, 'index'])
                     ->name('cms.public.home');
+            }
+
+            /*
+             * Resolve theme views only for public Statamic frontend requests.
+             * CRM admin and Statamic Control Panel views keep their own paths.
+             */
+            $frontendRoute = $router->getRoutes()->getByName('statamic.site');
+
+            if ($frontendRoute) {
+                $frontendRoute->middleware(ResolveCmsTheme::class);
+            }
+
+            $homepageRoute = $router->getRoutes()->getByName('cms.public.home');
+
+            if ($homepageRoute) {
+                $homepageRoute->middleware(ResolveCmsTheme::class);
             }
         });
     }
